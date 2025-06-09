@@ -9,19 +9,19 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: "Security"
+workgroup: "Automated Certificate Management Environment"
 keyword:
  - next generation
  - unicorn
  - sparkling distributed ledger
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: USER/REPO
-  latest: https://example.com/LATEST
+  group: "Automated Certificate Management Environment"
+  type: "Working Group"
+  mail: "acme@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/acme/"
+  github: "sheurich/draft-sheurich-acme-dns-persistent"
+  latest: "https://sheurich.github.io/draft-sheurich-acme-dns-persistent/draft-sheurich-acme-dns-persistent.html"
 
 author:
  -
