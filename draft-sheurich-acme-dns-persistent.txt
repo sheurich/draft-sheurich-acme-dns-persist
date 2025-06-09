@@ -2,35 +2,47 @@
 
 
 
-WG Working Group                                              Y. N. Here
-Internet-Draft                                    Your Organization Here
+Automated Certificate Management Environment                  S. Heurich
+Internet-Draft                                                    Fastly
 Intended status: Informational                               9 June 2025
 Expires: 11 December 2025
 
 
    Automated Certificate Management Environment (ACME) Challenge for
                   Persistent DNS TXT Record Validation
-                  draft-todo-yourname-protocol-latest
+               draft-sheurich-acme-dns-persistent-latest
 
 Abstract
 
-   TODO Abstract
+   This document specifies "dns-persistent-01", a new validation method
+   for the Automated Certificate Management Environment (ACME) protocol
+   defined in RFC 8555.  The method allows a Certification Authority
+   (CA) to verify domain control using a structured, long-lived DNS TXT
+   record.  This record contains a stable value linked to the
+   applicant's account with the CA, rather than the short-lived tokens
+   required by the "http-01" and "dns-01" challenges.  Persistence
+   enables asynchronous, multi-tenant, and highly constrained
+   deployments, supports wildcard certificate issuance, and remains
+   aligned with the CA/Browser Forum Baseline Requirements (BRs).
 
 About This Document
 
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://example.com/LATEST.  Status information for this document may
-   be found at https://datatracker.ietf.org/doc/draft-todo-yourname-
-   protocol/.
+   https://sheurich.github.io/draft-sheurich-acme-dns-persistent/draft-
+   sheurich-acme-dns-persistent.html.  Status information for this
+   document may be found at https://datatracker.ietf.org/doc/draft-
+   sheurich-acme-dns-persistent/.
 
-   Discussion of this document takes place on the WG Working Group
-   mailing list (mailto:WG@example.com), which is archived at
-   https://example.com/WG.
+   Discussion of this document takes place on the Automated Certificate
+   Management Environment Working Group mailing list
+   (mailto:acme@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/acme/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/acme/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/USER/REPO.
+   https://github.com/sheurich/draft-sheurich-acme-dns-persistent.
 
 Status of This Memo
 
@@ -75,7 +87,41 @@ Table of Contents
 
 1.  Introduction
 
-   TODO Introduction
+   The Automated Certificate Management Environment (ACME) protocol
+   (RFC 8555) automates certificate issuance and renewal.  Its existing
+   challenge methods — "http-01" and "dns-01" — deliberately expire
+   after a short interval, which is ideal for on-demand issuance driven
+   by an ACME client.  Some environments, however, must decouple
+   validation from issuance or reuse a validation over an extended
+   period.
+
+   Examples include:
+
+   *  IoT deployments that cannot host an HTTP service.
+
+   *  Multi-tenant hosting platforms where the entity updating DNS
+      differs from the certificate subscriber.
+
+   *  Organizations that batch issuance operations offline.
+
+   *  Scenarios requiring wildcard certificates where DNS control is
+      proven once for an extended period.
+
+   This document defines "dns-persistent-01", which proves domain
+   control through a DNS TXT resource record that can remain in place
+   for an extended period.  To prove control over a Fully Qualified
+   Domain Name (FQDN), the applicant provisions a DNS TXT record at an
+   "Authorization Domain Name" formed by prepending the label _acme-
+   challenge to the FQDN being validated (e.g., _acme-
+   challenge.example.com).  The RDATA of this TXT record contains a
+   persistent value that identifies both the CA and the applicant's
+   specific account with that CA.  The record format is based on the
+   "authority-token" ABNF in RFC 8659, incorporating an issuer-domain-
+   name and a mandatory accounturi parameter (RFC 8657, Section 3) that
+   uniquely identifies the applicant's account.  This method is
+   compatible with the CA/Browser Forum Baseline Requirements (BRs),
+   Section 3.2.2.4.22, and is suitable for issuing wildcard
+   certificates.
 
 2.  Conventions and Definitions
 
@@ -110,6 +156,6 @@ Acknowledgments
 
 Author's Address
 
-   Your Name Here
-   Your Organization Here
-   Email: your.email@example.com
+   Shiloh Heurich
+   Fastly
+   Email: sheurich@fastly.com
