@@ -19,8 +19,8 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation"
+abbrev: "ACME Persistent DNS Challenge"
 category: info
 
 docname: draft-todo-yourname-protocol-latest
