@@ -27,6 +27,26 @@ author:
     email: "sheurich@fastly.com"
 
 normative:
+  RFC2119:
+    title: "Key words for use in RFCs to Indicate Requirement Levels"
+    date: 1997-03
+    target: https://www.rfc-editor.org/info/rfc2119
+  RFC8174:
+    title: "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"
+    date: 2017-05
+    target: https://www.rfc-editor.org/info/rfc8174
+  RFC8555:
+    title: "Automatic Certificate Management Environment (ACME)"
+    date: 2019-03
+    target: https://www.rfc-editor.org/info/rfc8555
+  RFC8657:
+    title: "Certification Authority Authorization (CAA) Record Extensions for Account and Method Binding"
+    date: 2019-11
+    target: https://www.rfc-editor.org/info/rfc8657
+  RFC8659:
+    title: "DNS-Based Authentication of Named Entities (DANE) Bindings for Unsecured DNS"
+    date: 2019-11
+    target: https://www.rfc-editor.org/info/rfc8659
 
 informative:
 
