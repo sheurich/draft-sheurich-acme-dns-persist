@@ -6,11 +6,14 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation</title>
 <meta content="Shiloh Heurich" name="author">
-<meta content="
-       This document specifies &quot;dns-persistent-01&quot;, a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify an applicant's control over a domain name by confirming the presence of a persistent, structured DNS TXT record. This record contains a stable value that identifies the applicant's account with the CA, rather than the short-lived tokens required by the &quot;http-01&quot; and &quot;dns-01&quot; challenges defined in RFC 8555. The persistence of this record facilitates asynchronous issuance workflows, simplifies management in multi-tenant environments, supports wildcard certificate issuance, and is designed to be compatible with the CA/Browser Forum Baseline Requirements. 
-    " name="description">
+<meta content='
+       This document specifies "dns-persistent-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed to fulfill requirements specified in the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation. 
+    ' name="description">
 <meta content="xml2rfc 3.28.1" name="generator">
 <meta content="acme" name="keyword">
+<meta content="dns" name="keyword">
+<meta content="validation" name="keyword">
+<meta content="persistent" name="keyword">
 <meta content="draft-sheurich-acme-dns-persistent-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.28.1
@@ -1048,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Heurich</td>
-<td class="center">Expires 11 December 2025</td>
+<td class="center">Expires 12 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1061,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-sheurich-acme-dns-persistent-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-09" class="published">9 June 2025</time>
+<time datetime="2025-06-10" class="published">10 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-11">11 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-12">12 December 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1079,7 +1082,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies "dns-persistent-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify an applicant's control over a domain name by confirming the presence of a persistent, structured DNS TXT record. This record contains a stable value that identifies the applicant's account with the CA, rather than the short-lived tokens required by the "http-01" and "dns-01" challenges defined in RFC 8555. The persistence of this record facilitates asynchronous issuance workflows, simplifies management in multi-tenant environments, supports wildcard certificate issuance, and is designed to be compatible with the CA/Browser Forum Baseline Requirements.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies "dns-persistent-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed to fulfill requirements specified in the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1116,7 +1119,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 11 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1147,33 +1150,101 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <nav class="toc"><ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-relationship-to-ca-browser-" class="internal xref">Relationship to CA/Browser Forum Requirements</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-the-dns-persistent-01-chall" class="internal xref">The "dns-persistent-01" Challenge</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-the-dns-persistent-01-chall" class="internal xref">The "dns-persistent-01" Challenge</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-challenge-object" class="internal xref">Challenge Object</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
             <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-challenge-response-and-veri" class="internal xref">Challenge Response and Verification</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-multi-perspective-validatio" class="internal xref">Multi-Perspective Validation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-validation-data-reuse-and-t" class="internal xref">Validation Data Reuse and TTL Handling</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-wildcard-and-suffix-validat" class="internal xref">Wildcard and Suffix Validation</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-wildcard-certificate-valida" class="internal xref">Wildcard Certificate Validation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-subdomain-certificate-valid" class="internal xref">Subdomain Certificate Validation</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-persistent-record-risks" class="internal xref">Persistent Record Risks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-account-binding-security" class="internal xref">Account Binding Security</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-subdomain-validation-risks" class="internal xref">Subdomain Validation Risks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-cross-ca-validation-reuse" class="internal xref">Cross-CA Validation Reuse</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-record-tampering-and-integr" class="internal xref">Record Tampering and Integrity</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-acme-validation-methods-reg" class="internal xref">ACME Validation Methods Registry</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-implementation-consideratio" class="internal xref">Implementation Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-ca-implementation-guideline" class="internal xref">CA Implementation Guidelines</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-client-implementation-guide" class="internal xref">Client Implementation Guidelines</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-dns-provider-considerations" class="internal xref">DNS Provider Considerations</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-examples" class="internal xref">Examples</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-basic-validation-example" class="internal xref">Basic Validation Example</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-wildcard-validation-example" class="internal xref">Wildcard Validation Example</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1184,7 +1255,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">The Automated Certificate Management Environment (ACME) protocol <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> defines mechanisms for automating certificate issuance and domain validation. The existing challenge methods, "http-01" and "dns-01", rely on short-lived, single-use tokens. While effective for many use cases, this model presents challenges for environments that must decouple the act of domain validation from certificate issuance, or where DNS updates are managed by a different entity than the one requesting the certificate.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">The Automated Certificate Management Environment (ACME) protocol <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span> defines mechanisms for automating certificate issuance and domain validation. The existing challenge methods, "http-01" and "dns-01", require real-time interaction between the ACME client and the domain's infrastructure during the validation process. While effective for many use cases, these methods present challenges in certain deployment scenarios.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">Examples include:<a href="#section-1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-3.1">
@@ -1199,9 +1270,20 @@ svg :is([fill="white"], [fill^="#fff"]) {
         <li class="normal" id="section-1-3.4">
           <p id="section-1-3.4.1">Scenarios requiring wildcard certificates where domain control is proven once and reused over an extended period.<a href="#section-1-3.4.1" class="pilcrow">¶</a></p>
 </li>
+        <li class="normal" id="section-1-3.5">
+          <p id="section-1-3.5.1">Environments with strict change management processes where DNS modifications require approval workflows.<a href="#section-1-3.5.1" class="pilcrow">¶</a></p>
+</li>
       </ul>
-<p id="section-1-4">This document defines a new ACME challenge type, "dns-persistent-01". This method proves control over a Fully Qualified Domain Name (FQDN) by having the applicant provision a DNS TXT record at a specific name derived from the FQDN. The content (RDATA) of this record is a persistent value that identifies both the CA and the applicant's specific account with that CA.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">The record format is based on the "authority-token" ABNF in <span>[<a href="#RFC8659" class="cite xref">RFC8659</a>]</span>, incorporating an issuer-domain-name and a mandatory accounturi parameter <span>[<a href="#RFC8657" class="cite xref">RFC8657</a>]</span> that uniquely identifies the applicant's account. This approach aligns with the validation method described in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements and is suitable for issuing wildcard certificates.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document defines a new ACME challenge type, "dns-persistent-01". This method proves control over a Fully Qualified Domain Name (FQDN) by having the applicant provision a DNS TXT record at a specific subdomain that contains persistent validation information linking the domain to both the Certificate Authority and the applicant's account.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5">The record format is based on the "issue-value" syntax from <span>[<a href="#RFC8659" class="cite xref">RFC8659</a>]</span>, incorporating an issuer-domain-name and a mandatory accounturi parameter <span>[<a href="#RFC8657" class="cite xref">RFC8657</a>]</span> that uniquely identifies the applicant's account. This design provides strong binding between the domain, the CA, and the specific account requesting validation.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<div id="relationship-to-cabrowser-forum-requirements">
+<section id="section-1.1">
+        <h3 id="name-relationship-to-ca-browser-">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-relationship-to-ca-browser-" class="section-name selfRef">Relationship to CA/Browser Forum Requirements</a>
+        </h3>
+<p id="section-1.1-1">This validation method is designed to fulfill the requirements specified in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation. Certification Authorities implementing this method <span class="bcp14">MUST</span> comply with both this specification and the applicable Baseline Requirements, including requirements for Multi-Perspective Issuance Corroboration and validation data reuse periods.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="conventions-and-definitions">
@@ -1213,6 +1295,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
 "<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
 described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2"><strong>Authorization Domain Name</strong>: The domain name formed by prepending the DNS TXT Record Persistent DCV Domain Label to the domain name being validated.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3"><strong>DNS TXT Record Persistent DCV Domain Label</strong>: The label "_validation-persist" as defined in Appendix A of the CA/Browser Forum Baseline Requirements.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4"><strong>Issuer Domain Name</strong>: A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.<a href="#section-2-4" class="pilcrow">¶</a></p>
+<p id="section-2-5"><strong>Validation Data Reuse Period</strong>: The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.<a href="#section-2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="the-dns-persistent-01-challenge">
@@ -1220,8 +1306,39 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-the-dns-persistent-01-chall">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-the-dns-persistent-01-chall" class="section-name selfRef">The "dns-persistent-01" Challenge</a>
       </h2>
-<p id="section-3-1">The "dns-persistent-01" challenge allows an ACME client to demonstrate control over an FQDN by proving it can provision a DNS TXT record containing a specific, persistent value. The value links the FQDN to the client's ACME account with the CA.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">When an ACME client accepts a "dns-persistent-01" challenge, it proves control by provisioning a DNS TXT record at the Authorization Domain Name.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-1">The "dns-persistent-01" challenge allows an ACME client to demonstrate control over an FQDN by proving it can provision a DNS TXT record containing specific, persistent validation information. The validation information links the FQDN to both the Certificate Authority performing the validation and the specific ACME account requesting the validation.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">When an ACME client accepts a "dns-persistent-01" challenge, it proves control by provisioning a DNS TXT record at the Authorization Domain Name. Unlike the existing "dns-01" challenge, this record is designed to persist and may be reused for multiple certificate issuances over an extended period.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<div id="challenge-object">
+<section id="section-3.1">
+        <h3 id="name-challenge-object">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-challenge-object" class="section-name selfRef">Challenge Object</a>
+        </h3>
+<p id="section-3.1-1">The challenge object for "dns-persistent-01" contains the following fields:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1"><strong>type</strong> (required, string): The string "dns-persistent-01"<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1"><strong>url</strong> (required, string): The URL to which a response can be posted<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1"><strong>status</strong> (required, string): The status of this challenge<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-3.1-2.4">
+            <p id="section-3.1-2.4.1"><strong>issuer-domain-name</strong> (required, string): The Issuer Domain Name that the client <span class="bcp14">MUST</span> include in the DNS TXT record<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.1-3">Example challenge object:<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4"><code>json
+{
+  "type": "dns-persistent-01",
+  "url": "https://ca.example/acme/authz/1234/0",
+  "status": "pending",
+  "issuer-domain-name": "authority.example"
+}
+</code><a href="#section-3.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="challenge-response-and-verification">
@@ -1229,50 +1346,345 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-challenge-response-and-veri">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-challenge-response-and-veri" class="section-name selfRef">Challenge Response and Verification</a>
       </h2>
-<p id="section-4-1">To respond to the challenge, the ACME client provisions a DNS TXT record for the Authorization Domain Name being validated. The Authorization Domain Name is formed by prepending the label _acme-challenge to the FQDN for which authorization is being sought.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">The RDATA of this TXT record <span class="bcp14">MUST</span> fulfill the following requirements:<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">The RDATA value <span class="bcp14">MUST</span> conform to the issue-value syntax as defined in <span>[<a href="#RFC8659" class="cite xref">RFC8659</a>]</span>, Section 4.2.<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">The issue-value <span class="bcp14">MUST</span> contain an issuer-domain-name parameter. The value of this parameter <span class="bcp14">MUST</span> be an Issuer Domain Name that the CA discloses in its Certificate Policy (CP) and/or Certification Practices Statement (CPS).<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">The issue-value <span class="bcp14">MUST</span> contain an accounturi parameter. The value of this parameter <span class="bcp14">MUST</span> be a unique URI identifying the account of the applicant which requested the validation, as described in <span>[<a href="#RFC8657" class="cite xref">RFC8657</a>]</span>, Section 3.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<p id="section-4-6">For example, if the ACME client is requesting validation for the FQDN example.com from a CA that uses authority.example as its Issuer Domain Name, it would provision the following DNS TXT record:<a href="#section-4-6" class="pilcrow">¶</a></p>
-<p id="section-4-7">_acme-challenge.example.com. IN TXT "authority.example; accounturi=https://authority.example/acct/123"<a href="#section-4-7" class="pilcrow">¶</a></p>
-<p id="section-4-8">The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the server's issuer-domain-name and the accounturi of the requesting client.<a href="#section-4-8" class="pilcrow">¶</a></p>
+<p id="section-4-1">To respond to the challenge, the ACME client provisions a DNS TXT record for the Authorization Domain Name being validated. The Authorization Domain Name is formed by prepending the label "_validation-persist" to the domain name being validated.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">For example, if the domain being validated is "example.com", the Authorization Domain Name would be "_validation-persist.example.com".<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">The RDATA of this TXT record <span class="bcp14">MUST</span> fulfill the following requirements:<a href="#section-4-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4-4">
+<li id="section-4-4.1">
+          <p id="section-4-4.1.1">The RDATA value <span class="bcp14">MUST</span> conform to the issue-value syntax as defined in <span>[<a href="#RFC8659" class="cite xref">RFC8659</a>]</span>, Section 4.2.<a href="#section-4-4.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-4.2">
+          <p id="section-4-4.2.1">The issue-value <span class="bcp14">MUST</span> contain an issuer-domain-name parameter. The value of this parameter <span class="bcp14">MUST</span> be the Issuer Domain Name provided by the CA in the challenge object.<a href="#section-4-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-4.3">
+          <p id="section-4-4.3.1">The issue-value <span class="bcp14">MUST</span> contain an accounturi parameter. The value of this parameter <span class="bcp14">MUST</span> be a unique URI identifying the account of the applicant which requested the validation, constructed according to <span>[<a href="#RFC8657" class="cite xref">RFC8657</a>]</span>, Section 3.<a href="#section-4-4.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-4-5">For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", it would provision the following DNS TXT record:<a href="#section-4-5" class="pilcrow">¶</a></p>
+<p id="section-4-6"><code>
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
+</code><a href="#section-4-6" class="pilcrow">¶</a></p>
+<p id="section-4-7">The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account.<a href="#section-4-7" class="pilcrow">¶</a></p>
+<div id="multi-perspective-validation">
+<section id="section-4.1">
+        <h3 id="name-multi-perspective-validatio">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-multi-perspective-validatio" class="section-name selfRef">Multi-Perspective Validation</a>
+        </h3>
+<p id="section-4.1-1">CAs performing validations using the "dns-persistent-01" method <span class="bcp14">MUST</span> implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective <span class="bcp14">MUST</span> observe the same challenge information as the Primary Network Perspective.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="wildcard-and-suffix-validation">
+<div id="validation-data-reuse-and-ttl-handling">
+<section id="section-4.2">
+        <h3 id="name-validation-data-reuse-and-t">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-validation-data-reuse-and-t" class="section-name selfRef">Validation Data Reuse and TTL Handling</a>
+        </h3>
+<p id="section-4.2-1">This validation method is explicitly designed for persistence and reuse. If the DNS TXT record has a Time-to-Live (TTL) that is less than the CA's defined validation data reuse period, then the CA <span class="bcp14">MUST</span> consider the validation data reuse period to be equal to the TTL or 8 hours, whichever is greater.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">CAs <span class="bcp14">MAY</span> reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described above.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="wildcard-certificate-validation">
 <section id="section-5">
-      <h2 id="name-wildcard-and-suffix-validat">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-wildcard-and-suffix-validat" class="section-name selfRef">Wildcard and Suffix Validation</a>
+      <h2 id="name-wildcard-certificate-valida">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-wildcard-certificate-valida" class="section-name selfRef">Wildcard Certificate Validation</a>
       </h2>
-<p id="section-5-1">This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com).<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">Furthermore, once an FQDN has been successfully validated using this method, the CA <span class="bcp14">MAY</span> also consider this validation sufficient for issuing certificates for any other FQDNs that end with all the Domain Labels of the validated FQDN. For example, a successful validation for example.com may also be used to issue a certificate for www.example.com.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">Validation Data Reuse
-This validation method is explicitly designed for persistence. If the DNS TXT record has a Time-to-Live (TTL) that is less than the CA's defined validation data reuse period, then the CA <span class="bcp14">MUST</span> consider the reuse period for this validation to be the greater of either the record's TTL or 8 hours.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-1">This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). A single DNS TXT record placed at the Authorization Domain Name can validate both the base domain and wildcard certificates for that domain.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2">For example, a TXT record at "_validation-persist.example.com" can validate certificates for both "example.com" and "*.example.com".<a href="#section-5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subdomain-certificate-validation">
+<section id="section-6">
+      <h2 id="name-subdomain-certificate-valid">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-subdomain-certificate-valid" class="section-name selfRef">Subdomain Certificate Validation</a>
+      </h2>
+<p id="section-6-1">Once an FQDN has been successfully validated using this method, the CA <span class="bcp14">MAY</span> also consider this validation sufficient for issuing certificates for other FQDNs that are subdomains of the validated FQDN, provided that all the Domain Labels of the validated FQDN appear as a suffix in the certificate subject.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2"><strong>Security Warning</strong>: This capability creates significant security implications. Organizations using this feature <span class="bcp14">MUST</span> carefully control subdomain delegation and monitor for unauthorized subdomains. CAs <span class="bcp14">SHOULD</span> provide mechanisms for domain owners to opt out of subdomain validation or limit its scope.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">For example, validation of "dept.example.com" could authorize certificates for "server.dept.example.com" but would not authorize certificates for "other-dept.example.com".<a href="#section-6-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-security-considerations">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-6-1">The persistence of the validation record means that its compromise could allow an attacker to obtain certificates for the validated domain until the record is removed or changed. Clients <span class="bcp14">SHOULD</span> protect the integrity of their DNS records accordingly.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">CAs performing validations using the "dns-persistent-01" method <span class="bcp14">MUST</span> implement Multi-Perspective Issuance Corroboration as specified in Section 3.2.2.9 of the CA/Browser Forum Baseline Requirements. To count as a corroborating validation, each network perspective used by the CA <span class="bcp14">MUST</span> observe the same challenge information (i.e., the same TXT record RDATA) as the primary network perspective.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<div id="persistent-record-risks">
+<section id="section-7.1">
+        <h3 id="name-persistent-record-risks">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-persistent-record-risks" class="section-name selfRef">Persistent Record Risks</a>
+        </h3>
+<p id="section-7.1-1">The persistence of validation records creates extended windows of vulnerability compared to traditional ACME challenge methods. If an attacker gains control of a DNS zone containing persistent validation records, they can potentially obtain certificates for the validated domains until the validation records are removed or modified.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">Clients <span class="bcp14">SHOULD</span> protect validation records through appropriate DNS security measures, including:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.1-3.1">
+            <p id="section-7.1-3.1.1">Using DNS providers with strong authentication and access controls<a href="#section-7.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.1-3.2">
+            <p id="section-7.1-3.2.1">Implementing DNS security extensions (DNSSEC) where possible<a href="#section-7.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.1-3.3">
+            <p id="section-7.1-3.3.1">Monitoring DNS zones for unauthorized changes<a href="#section-7.1-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.1-3.4">
+            <p id="section-7.1-3.4.1">Regularly reviewing and rotating validation records<a href="#section-7.1-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="account-binding-security">
+<section id="section-7.2">
+        <h3 id="name-account-binding-security">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-account-binding-security" class="section-name selfRef">Account Binding Security</a>
+        </h3>
+<p id="section-7.2-1">The accounturi parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">CAs <span class="bcp14">SHOULD</span> implement robust account security measures, including:<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.2-3.1">
+            <p id="section-7.2-3.1.1">Strong authentication requirements for ACME accounts<a href="#section-7.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-3.2">
+            <p id="section-7.2-3.2.1">Account activity monitoring and anomaly detection<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-3.3">
+            <p id="section-7.2-3.3.1">Rapid account revocation capabilities<a href="#section-7.2-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-3.4">
+            <p id="section-7.2-3.4.1">Regular account security reviews<a href="#section-7.2-3.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="subdomain-validation-risks">
+<section id="section-7.3">
+        <h3 id="name-subdomain-validation-risks">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-subdomain-validation-risks" class="section-name selfRef">Subdomain Validation Risks</a>
+        </h3>
+<p id="section-7.3-1">The ability to issue certificates for subdomains of validated FQDNs creates significant security risks, particularly in environments with subdomain delegation or where subdomains may be controlled by different entities.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">Potential risks include:<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.3-3.1">
+            <p id="section-7.3-3.1.1">Subdomain takeover attacks where abandoned subdomains are claimed by attackers<a href="#section-7.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.3-3.2">
+            <p id="section-7.3-3.2.1">Unauthorized certificate issuance for subdomains controlled by different organizations<a href="#section-7.3-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.3-3.3">
+            <p id="section-7.3-3.3.1">Confusion about which entity has authority over specific subdomains<a href="#section-7.3-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.3-4">Organizations considering the use of subdomain validation <span class="bcp14">MUST</span>:<a href="#section-7.3-4" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.3-5.1">
+            <p id="section-7.3-5.1.1">Maintain strict control over subdomain delegation<a href="#section-7.3-5.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.3-5.2">
+            <p id="section-7.3-5.2.1">Implement monitoring for subdomain creation and changes<a href="#section-7.3-5.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.3-5.3">
+            <p id="section-7.3-5.3.1">Consider limiting subdomain validation to specific, controlled scenarios<a href="#section-7.3-5.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.3-5.4">
+            <p id="section-7.3-5.4.1">Provide clear governance policies for subdomain certificate authority<a href="#section-7.3-5.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="cross-ca-validation-reuse">
+<section id="section-7.4">
+        <h3 id="name-cross-ca-validation-reuse">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-cross-ca-validation-reuse" class="section-name selfRef">Cross-CA Validation Reuse</a>
+        </h3>
+<p id="section-7.4-1">The persistent nature of validation records raises concerns about potential reuse across different Certificate Authorities. While the issuer-domain-name parameter is designed to prevent such reuse, implementations <span class="bcp14">MUST</span> carefully validate that the issuer-domain-name in the DNS record matches the CA's disclosed Issuer Domain Name.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="record-tampering-and-integrity">
+<section id="section-7.5">
+        <h3 id="name-record-tampering-and-integr">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-record-tampering-and-integr" class="section-name selfRef">Record Tampering and Integrity</a>
+        </h3>
+<p id="section-7.5-1">DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs <span class="bcp14">SHOULD</span> implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-iana-considerations">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-7-1">This document has no IANA actions.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div id="acme-validation-methods-registry">
+<section id="section-8.1">
+        <h3 id="name-acme-validation-methods-reg">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-acme-validation-methods-reg" class="section-name selfRef">ACME Validation Methods Registry</a>
+        </h3>
+<p id="section-8.1-1">IANA is requested to register the following entry in the "ACME Validation Methods" registry:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-8.1-2.1">
+            <p id="section-8.1-2.1.1"><strong>Label</strong>: dns-persistent-01<a href="#section-8.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.1-2.2">
+            <p id="section-8.1-2.2.1"><strong>Identifier Type</strong>: dns<a href="#section-8.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.1-2.3">
+            <p id="section-8.1-2.3.1"><strong>ACME</strong>: Y<a href="#section-8.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-8.1-2.4">
+            <p id="section-8.1-2.4.1"><strong>Reference</strong>: [This document]<a href="#section-8.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="implementation-considerations">
+<section id="section-9">
+      <h2 id="name-implementation-consideratio">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-implementation-consideratio" class="section-name selfRef">Implementation Considerations</a>
+      </h2>
+<div id="ca-implementation-guidelines">
+<section id="section-9.1">
+        <h3 id="name-ca-implementation-guideline">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-ca-implementation-guideline" class="section-name selfRef">CA Implementation Guidelines</a>
+        </h3>
+<p id="section-9.1-1">Certificate Authorities implementing this validation method should consider:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.1-2.1">
+            <p id="section-9.1-2.1.1">Establishing clear policies for Issuer Domain Name disclosure in Certificate Policies and Certification Practice Statements<a href="#section-9.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.2">
+            <p id="section-9.1-2.2.1">Implementing robust multi-perspective validation infrastructure<a href="#section-9.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.3">
+            <p id="section-9.1-2.3.1">Developing procedures for handling validation record TTL variations<a href="#section-9.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.4">
+            <p id="section-9.1-2.4.1">Creating account security monitoring and incident response procedures<a href="#section-9.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.1-2.5">
+            <p id="section-9.1-2.5.1">Providing clear documentation for clients on proper record construction<a href="#section-9.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="client-implementation-guidelines">
+<section id="section-9.2">
+        <h3 id="name-client-implementation-guide">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-client-implementation-guide" class="section-name selfRef">Client Implementation Guidelines</a>
+        </h3>
+<p id="section-9.2-1">ACME clients implementing this validation method should consider:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.2-2.1">
+            <p id="section-9.2-2.1.1">Implementing secure DNS record management practices<a href="#section-9.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.2">
+            <p id="section-9.2-2.2.1">Providing clear user interfaces for managing persistent validation records<a href="#section-9.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.3">
+            <p id="section-9.2-2.3.1">Implementing validation record monitoring and alerting<a href="#section-9.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.4">
+            <p id="section-9.2-2.4.1">Designing appropriate error handling for validation failures<a href="#section-9.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.2-2.5">
+            <p id="section-9.2-2.5.1">Considering the security implications of persistent records in their threat models<a href="#section-9.2-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="dns-provider-considerations">
+<section id="section-9.3">
+        <h3 id="name-dns-provider-considerations">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-dns-provider-considerations" class="section-name selfRef">DNS Provider Considerations</a>
+        </h3>
+<p id="section-9.3-1">DNS providers supporting this validation method should consider:<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-9.3-2.1">
+            <p id="section-9.3-2.1.1">Implementing appropriate access controls for validation record management<a href="#section-9.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-2.2">
+            <p id="section-9.3-2.2.1">Providing audit logging for validation record changes<a href="#section-9.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-2.3">
+            <p id="section-9.3-2.3.1">Supporting reasonable TTL values for validation records<a href="#section-9.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-9.3-2.4">
+            <p id="section-9.3-2.4.1">Considering dedicated interfaces or APIs for ACME validation record management<a href="#section-9.3-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+</section>
+</div>
+<div id="examples">
+<section id="section-10">
+      <h2 id="name-examples">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-examples" class="section-name selfRef">Examples</a>
+      </h2>
+<div id="basic-validation-example">
+<section id="section-10.1">
+        <h3 id="name-basic-validation-example">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-basic-validation-example" class="section-name selfRef">Basic Validation Example</a>
+        </h3>
+<p id="section-10.1-1">For validation of "example.com" by a CA using "authority.example" as its Issuer Domain Name:<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-10.1-2">
+<li id="section-10.1-2.1">
+            <p id="section-10.1-2.1.1">CA provides challenge object:
+<code>json
+{
+  "type": "dns-persistent-01",
+  "url": "https://ca.example/acme/authz/1234/0",
+  "status": "pending",
+  "issuer-domain-name": "authority.example"
+}
+</code><a href="#section-10.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-10.1-2.2">
+            <p id="section-10.1-2.2.1">Client provisions DNS TXT record:
+<code>
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
+</code><a href="#section-10.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-10.1-2.3">
+            <p id="section-10.1-2.3.1">CA validates the record through multi-perspective DNS queries<a href="#section-10.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
+<div id="wildcard-validation-example">
+<section id="section-10.2">
+        <h3 id="name-wildcard-validation-example">
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-wildcard-validation-example" class="section-name selfRef">Wildcard Validation Example</a>
+        </h3>
+<p id="section-10.2-1">For validation of "*.example.com":<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-10.2-2">
+<li id="section-10.2-2.1">
+            <p id="section-10.2-2.1.1">Same challenge object format as above<a href="#section-10.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-10.2-2.2">
+            <p id="section-10.2-2.2.1">Same DNS TXT record placement at "_validation-persist.example.com"<a href="#section-10.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-10.2-2.3">
+            <p id="section-10.2-2.3.1">Validation authorizes both "example.com" and "*.example.com" certificates<a href="#section-10.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+</section>
+</div>
 </section>
 </div>
 <div id="sec-normative-references">
-<section id="section-8">
+<section id="section-11">
       <h2 id="name-normative-references">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
       </h2>
 <dl class="references">
+<dt id="RFC1034">[RFC1034]</dt>
+      <dd>
+<span class="refTitle">"Domain Names - Concepts and Facilities"</span>, <time datetime="1987-11" class="refDate">November 1987</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc1034">https://www.rfc-editor.org/info/rfc1034</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1035">[RFC1035]</dt>
+      <dd>
+<span class="refTitle">"Domain Names - Implementation and Specification"</span>, <time datetime="1987-11" class="refDate">November 1987</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc1035">https://www.rfc-editor.org/info/rfc1035</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
@@ -1301,7 +1713,8 @@ This validation method is explicitly designed for persistence. If the DNS TXT re
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">TODO acknowledge.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Thanks to the contributors and reviewers who provided feedback on early versions of this document.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
