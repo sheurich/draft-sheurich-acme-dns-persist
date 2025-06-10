@@ -400,7 +400,7 @@ Table of Contents
 
    *  *ACME*: Y
 
-   *  *Reference*: [This document]
+   *  *Reference*: This document
 
 9.  Implementation Considerations
 
@@ -484,11 +484,13 @@ Table of Contents
 
 11.  Normative References
 
-   [RFC1034]  "Domain Names - Concepts and Facilities", November 1987,
-              <https://www.rfc-editor.org/info/rfc1034>.
+   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
+              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
+              <https://www.rfc-editor.org/rfc/rfc1034>.
 
-   [RFC1035]  "Domain Names - Implementation and Specification",
-              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+              November 1987, <https://www.rfc-editor.org/rfc/rfc1035>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -499,16 +501,21 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-   [RFC8555]  "Automatic Certificate Management Environment (ACME)",
-              March 2019, <https://www.rfc-editor.org/info/rfc8555>.
+   [RFC8555]  Barnes, R., Hoffman-Andrews, J., McCarney, D., and J.
+              Kasten, "Automatic Certificate Management Environment
+              (ACME)", RFC 8555, DOI 10.17487/RFC8555, March 2019,
+              <https://www.rfc-editor.org/rfc/rfc8555>.
 
-   [RFC8657]  "Certification Authority Authorization (CAA) Record
-              Extensions for Account and Method Binding", November 2019,
-              <https://www.rfc-editor.org/info/rfc8657>.
+   [RFC8657]  Landau, H., "Certification Authority Authorization (CAA)
+              Record Extensions for Account URI and Automatic
+              Certificate Management Environment (ACME) Method Binding",
+              RFC 8657, DOI 10.17487/RFC8657, November 2019,
+              <https://www.rfc-editor.org/rfc/rfc8657>.
 
-   [RFC8659]  "DNS-Based Authentication of Named Entities (DANE)
-              Bindings for Unsecured DNS", November 2019,
-              <https://www.rfc-editor.org/info/rfc8659>.
+   [RFC8659]  Hallam-Baker, P., Stradling, R., and J. Hoffman-Andrews,
+              "DNS Certification Authority Authorization (CAA) Resource
+              Record", RFC 8659, DOI 10.17487/RFC8659, November 2019,
+              <https://www.rfc-editor.org/rfc/rfc8659>.
 
 Acknowledgments
 
