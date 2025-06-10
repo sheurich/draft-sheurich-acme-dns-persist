@@ -31,33 +31,10 @@ author:
 
 normative:
   RFC1034:
-    title: "Domain Names - Concepts and Facilities"
-    date: 1987-11
-    target: https://www.rfc-editor.org/info/rfc1034
   RFC1035:
-    title: "Domain Names - Implementation and Specification"
-    date: 1987-11
-    target: https://www.rfc-editor.org/info/rfc1035
-  RFC2119:
-    title: "Key words for use in RFCs to Indicate Requirement Levels"
-    date: 1997-03
-    target: https://www.rfc-editor.org/info/rfc2119
-  RFC8174:
-    title: "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"
-    date: 2017-05
-    target: https://www.rfc-editor.org/info/rfc8174
   RFC8555:
-    title: "Automatic Certificate Management Environment (ACME)"
-    date: 2019-03
-    target: https://www.rfc-editor.org/info/rfc8555
   RFC8657:
-    title: "Certification Authority Authorization (CAA) Record Extensions for Account and Method Binding"
-    date: 2019-11
-    target: https://www.rfc-editor.org/info/rfc8657
   RFC8659:
-    title: "DNS-Based Authentication of Named Entities (DANE) Bindings for Unsecured DNS"
-    date: 2019-11
-    target: https://www.rfc-editor.org/info/rfc8659
 
 informative:
 
@@ -229,7 +206,7 @@ IANA is requested to register the following entry in the "ACME Validation Method
 - **Label**: dns-persistent-01
 - **Identifier Type**: dns
 - **ACME**: Y
-- **Reference**: [This document]
+- **Reference**: This document
 
 # Implementation Considerations
 
