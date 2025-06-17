@@ -93,14 +93,14 @@ The challenge object for "dns-persist-01" contains the following fields:
 
 Example challenge object:
 
-```json
+~~~json
 {
   "type": "dns-persist-01",
   "url": "https://ca.example/acme/authz/1234/0",
   "status": "pending",
   "issuer-domain-name": "authority.example"
 }
-```
+~~~
 
 # Challenge Response and Verification
 
@@ -128,15 +128,15 @@ If the `policy` parameter is absent, the validation MUST only apply to the speci
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
-```
+~~~
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=specific-subdomains-only"
-```
+~~~
 
 If no policy parameter is included, the record defaults to FQDN-only validation:
 
-```
+~~~
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
-```
+~~~
 
 The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account. The server also interprets any `policy` parameter values according to this specification.
 
@@ -272,19 +272,21 @@ DNS providers supporting this validation method should consider:
 For validation of "example.com" by a CA using "authority.example" as its Issuer Domain Name, where the validation should only apply to "example.com":
 
 1. CA provides challenge object:
-```json
+
+~~~json
 {
   "type": "dns-persist-01",
   "url": "https://ca.example/acme/authz/1234/0",
   "status": "pending",
   "issuer-domain-name": "authority.example"
 }
-```
+~~~
 
 2. Client provisions DNS TXT record (note the absence of a `policy` parameter for scope):
-```
+
+~~~
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
-```
+~~~
 
 3. CA validates the record through multi-perspective DNS queries. This validation is sufficient only for "example.com".
 
@@ -295,9 +297,10 @@ For validation of "example.com" and its specific subdomains (e.g., "www.example.
 1. Same challenge object format as above.
 
 2. Client provisions DNS TXT record including `policy=specific-subdomains-only`:
-```
+
+~~~
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=specific-subdomains-only"
-```
+~~~
 
 3. CA validates the record. This validation authorizes certificates for "example.com" and specific subdomains like "www.example.com", but not for "*.example.com".
 
@@ -308,9 +311,10 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 1. Same challenge object format as above.
 
 2. Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard-allowed`:
-```
+
+~~~
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard-allowed"
-```
+~~~
 
 3. CA validates the record through multi-perspective DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
 
