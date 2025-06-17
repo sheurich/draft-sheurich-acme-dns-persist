@@ -3,7 +3,7 @@ title: "Automated Certificate Management Environment (ACME) Challenge for Persis
 abbrev: "ACME Persistent DNS Challenge"
 category: info
 
-docname: draft-sheurich-acme-dns-persistent-latest
+docname: draft-sheurich-acme-dns-persist-latest
 submissiontype: IETF
 number:
 date: 2025-06-10
@@ -21,8 +21,8 @@ venue:
   type: "Working Group"
   mail: "acme@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/acme/"
-  github: "sheurich/draft-sheurich-acme-dns-persistent"
-  latest: "https://sheurich.github.io/draft-sheurich-acme-dns-persistent/draft-sheurich-acme-dns-persistent.html"
+  github: "sheurich/draft-sheurich-acme-dns-persist"
+  latest: "https://sheurich.github.io/draft-sheurich-acme-dns-persist/draft-sheurich-acme-dns-persist.html"
 
 author:
   - fullname: "Shiloh Heurich"
@@ -40,7 +40,7 @@ informative:
 
 --- abstract
 
-This document specifies "dns-persistent-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed to fulfill requirements specified in the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation.
+This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed to fulfill requirements specified in the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation.
 
 --- middle
 
@@ -56,7 +56,7 @@ Examples include:
 - Scenarios requiring wildcard certificates where domain control is proven once and reused over an extended period.
 - Environments with strict change management processes where DNS modifications require approval workflows.
 
-This document defines a new ACME challenge type, "dns-persistent-01". This method proves control over a Fully Qualified Domain Name (FQDN) by having the applicant provision a DNS TXT record at a specific subdomain that contains persistent validation information linking the domain to both the Certificate Authority and the applicant's account.
+This document defines a new ACME challenge type, "dns-persist-01". This method proves control over a Fully Qualified Domain Name (FQDN) by confirming the presence of a persistent DNS TXT record containing CA and account identification information.
 
 The record format is based on the "issue-value" syntax from {{RFC8659}}, incorporating an issuer-domain-name and a mandatory accounturi parameter {{RFC8657}} that uniquely identifies the applicant's account. This design provides strong binding between the domain, the CA, and the specific account requesting validation.
 
@@ -76,17 +76,17 @@ This validation method is designed to fulfill the requirements specified in Sect
 
 **Validation Data Reuse Period**: The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
-# The "dns-persistent-01" Challenge
+# The "dns-persist-01" Challenge
 
-The "dns-persistent-01" challenge allows an ACME client to demonstrate control over an FQDN by proving it can provision a DNS TXT record containing specific, persistent validation information. The validation information links the FQDN to both the Certificate Authority performing the validation and the specific ACME account requesting the validation.
+The "dns-persist-01" challenge allows an ACME client to demonstrate control over an FQDN by proving it can provision a DNS TXT record containing specific, persistent validation information. The validation information links the FQDN to both the Certificate Authority performing the validation and the specific ACME account requesting the validation.
 
-When an ACME client accepts a "dns-persistent-01" challenge, it proves control by provisioning a DNS TXT record at the Authorization Domain Name. Unlike the existing "dns-01" challenge, this record is designed to persist and may be reused for multiple certificate issuances over an extended period.
+When an ACME client accepts a "dns-persist-01" challenge, it proves control by provisioning a DNS TXT record at the Authorization Domain Name. Unlike the existing "dns-01" challenge, this record is designed to persist and may be reused for multiple certificate issuances over an extended period.
 
 ## Challenge Object
 
-The challenge object for "dns-persistent-01" contains the following fields:
+The challenge object for "dns-persist-01" contains the following fields:
 
-- **type** (required, string): The string "dns-persistent-01"
+- **type** (required, string): The string "dns-persist-01"
 - **url** (required, string): The URL to which a response can be posted
 - **status** (required, string): The status of this challenge
 - **issuer-domain-name** (required, string): The Issuer Domain Name that the client MUST include in the DNS TXT record
@@ -95,7 +95,7 @@ Example challenge object:
 
 ```json
 {
-  "type": "dns-persistent-01",
+  "type": "dns-persist-01",
   "url": "https://ca.example/acme/authz/1234/0",
   "status": "pending",
   "issuer-domain-name": "authority.example"
@@ -126,7 +126,7 @@ The ACME server verifies the challenge by performing a DNS lookup for the TXT re
 
 ## Multi-Perspective Validation
 
-CAs performing validations using the "dns-persistent-01" method MUST implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective MUST observe the same challenge information as the Primary Network Perspective.
+CAs performing validations using the "dns-persist-01" method MUST implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective MUST observe the same challenge information as the Primary Network Perspective.
 
 ## Validation Data Reuse and TTL Handling
 
@@ -163,7 +163,7 @@ Clients SHOULD protect validation records through appropriate DNS security measu
 
 ## Account Binding Security
 
-The accounturi parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.
+The `accounturi` parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.
 
 CAs SHOULD implement robust account security measures, including:
 
@@ -203,7 +203,7 @@ DNS records are generally not authenticated end-to-end, making them potentially 
 
 IANA is requested to register the following entry in the "ACME Validation Methods" registry:
 
-- **Label**: dns-persistent-01
+- **Label**: dns-persist-01
 - **Identifier Type**: dns
 - **ACME**: Y
 - **Reference**: This document
@@ -248,7 +248,7 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 1. CA provides challenge object:
 ```json
 {
-  "type": "dns-persistent-01",
+  "type": "dns-persist-01",
   "url": "https://ca.example/acme/authz/1234/0",
   "status": "pending",
   "issuer-domain-name": "authority.example"
