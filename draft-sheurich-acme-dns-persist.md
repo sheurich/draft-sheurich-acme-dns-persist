@@ -51,7 +51,7 @@ The Automated Certificate Management Environment (ACME) protocol {{RFC8555}} def
 Examples include:
 
 - Internet of Things (IoT) deployments where devices may not be able to host an HTTP service or coordinate DNS updates in real-time.
-- Multi-tenant hosting platforms where the entity managing the DNS zone is distinct from the tenant subscribing to the certificate.
+- Edge compute and multi-tenant hosting platforms where the entity managing the DNS zone is distinct from the tenant subscribing to the certificate.
 - Organizations that wish to pre-validate domains and batch issuance operations offline or at a later time.
 - Scenarios requiring wildcard certificates where domain control is proven once and reused over an extended period.
 - Environments with strict change management processes where DNS modifications require approval workflows.
@@ -110,9 +110,9 @@ For example, if the domain being validated is "example.com", the Authorization D
 
 The RDATA of this TXT record MUST fulfill the following requirements:
 
-1. The RDATA value MUST conform to the issue-value syntax as defined in {{RFC8659}}, Section 4.2.
+1. The RDATA value MUST conform to the issue-value syntax as defined in {{RFC8659}}, Section 4.
 
-2. The issue-value MUST contain an issuer-domain-name parameter. The value of this parameter MUST be the Issuer Domain Name provided by the CA in the challenge object.
+2. The `issuer-domain-name` portion of the issue-value MUST be the Issuer Domain Name provided by the CA in the challenge object.
 
 3. The issue-value MUST contain an accounturi parameter. The value of this parameter MUST be a unique URI identifying the account of the applicant which requested the validation, constructed according to {{RFC8657}}, Section 3.
 
