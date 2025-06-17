@@ -4,16 +4,16 @@
 
 This is the working area for the individual Internet-Draft, "Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation".
 
-* [Editor's Copy](https://sheurich.github.io/draft-sheurich-acme-dns-persistent/#go.draft-sheurich-acme-dns-persistent.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-sheurich-acme-dns-persistent)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-sheurich-acme-dns-persistent)
-* [Compare Editor's Copy to Individual Draft](https://sheurich.github.io/draft-sheurich-acme-dns-persistent/#go.draft-sheurich-acme-dns-persistent.diff)
+* [Editor's Copy](https://sheurich.github.io/draft-sheurich-acme-dns-persist/#go.draft-sheurich-acme-dns-persist.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-sheurich-acme-dns-persist)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-sheurich-acme-dns-persist)
+* [Compare Editor's Copy to Individual Draft](https://sheurich.github.io/draft-sheurich-acme-dns-persist/#go.draft-sheurich-acme-dns-persist.diff)
 
 
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/sheurich/draft-sheurich-acme-dns-persistent/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/sheurich/draft-sheurich-acme-dns-persist/blob/main/CONTRIBUTING.md).
 
 Contributions can be made by creating pull requests.
 The GitHub interface supports creating pull requests using the Edit (✏) button.
