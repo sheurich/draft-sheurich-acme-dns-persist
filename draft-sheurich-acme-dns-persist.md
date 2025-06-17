@@ -37,6 +37,12 @@ normative:
   RFC8555:
   RFC8657:
   RFC8659:
+  CABF-BR:
+    title: "Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates"
+    author:
+      org: "CA/Browser Forum"
+    date: 2024
+    target: "https://cabforum.org/baseline-requirements-documents/"
 
 informative:
 
@@ -64,7 +70,7 @@ The record format is based on the "issue-value" syntax from {{RFC8659}}, incorpo
 
 ## Relationship to CA/Browser Forum Requirements {#relationship-to-cabf}
 
-This validation method is designed to fulfill the requirements specified in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation. Certification Authorities implementing this method MUST comply with both this specification and the applicable Baseline Requirements, including requirements for Multi-Perspective Issuance Corroboration and validation data reuse periods.
+This validation method is designed to fulfill the requirements specified in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements {{CABF-BR}} for persistent DNS TXT record validation. Certification Authorities implementing this method MUST comply with both this specification and the applicable Baseline Requirements, including requirements for Multi-Perspective Issuance Corroboration and validation data reuse periods.
 
 # Conventions and Definitions {#conventions-and-definitions}
 
@@ -126,7 +132,7 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 CAs MUST parse the issue-value string by first separating semicolon-separated fields, then parsing each field as either a domain name (for the issuer-domain-name) or a key=value pair (for accounturi and policy parameters).
 
-If the `policy` parameter is absent, the validation MUST only apply to the specific FQDN for which the record is set. If the `policy` parameter is present but contains a value not defined in this specification for scope modification, CAs MUST ignore the entire policy parameter and treat the validation as applying only to the specific FQDN. CAs MUST ignore unknown parameter keys not defined in this specification.
+If the `policy` parameter is absent, the validation MUST only apply to the specific FQDN for which the record is set. If the `policy` parameter is present but contains a value not defined in this specification (i.e., any value other than `specific-subdomains-only` or `wildcard-allowed`), CAs MUST ignore the entire policy parameter and treat the validation as applying only to the specific FQDN. CAs MUST ignore unknown parameter keys not defined in this specification.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
@@ -174,7 +180,7 @@ If the `policy` parameter is absent, or if it is present but does not authorize 
 
 **Security Warning**: Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
 
-For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "other-dept.example.com" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.
+For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "dept.example.org" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.
 
 # Security Considerations {#security-considerations}
 
@@ -193,12 +199,17 @@ Clients SHOULD protect validation records through appropriate DNS security measu
 
 The `accounturi` parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.
 
+More specifically, if the ACME account key is compromised, an attacker can immediately use any pre-existing `dns-persist-01` authorizations for that account to issue certificates without requiring any additional access to DNS infrastructure. This represents a significant risk given the persistent nature of these validation records.
+
 CAs SHOULD implement robust account security measures, including:
 
 - Strong authentication requirements for ACME accounts
 - Account activity monitoring and anomaly detection
 - Rapid account revocation capabilities
 - Regular account security reviews
+- Account key rotation policies and procedures
+
+Clients SHOULD protect their ACME account keys with the same level of security as they would protect private keys for high-value certificates.
 
 ## Subdomain Validation Risks {#subdomain-validation-risks}
 
@@ -224,6 +235,8 @@ The persistent nature of validation records raises concerns about potential reus
 ## Record Tampering and Integrity {#record-tampering-and-integrity}
 
 DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.
+
+Additionally, if an attacker could compromise the DNS infrastructure for a CA's `issuer-domain-name` (e.g., `authority.example`), they could potentially create confusion about CA identity, although this represents a systemic risk that extends beyond this specific validation method. CAs SHOULD protect their issuer domain names with appropriate DNS security measures.
 
 # IANA Considerations {#iana-considerations}
 
@@ -326,5 +339,4 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.
 
-Thanks to the contributors and reviewers who provided feedback on early versions of this document.
 Thanks to the contributors and reviewers who provided feedback on early versions of this document.
