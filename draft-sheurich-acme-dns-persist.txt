@@ -10,7 +10,7 @@ Expires: 12 December 2025
 
    Automated Certificate Management Environment (ACME) Challenge for
                   Persistent DNS TXT Record Validation
-               draft-sheurich-acme-dns-persistent-latest
+                 draft-sheurich-acme-dns-persist-latest
 
 Abstract
 
@@ -31,10 +31,10 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://sheurich.github.io/draft-sheurich-acme-dns-persistent/draft-
-   sheurich-acme-dns-persistent.html.  Status information for this
-   document may be found at https://datatracker.ietf.org/doc/draft-
-   sheurich-acme-dns-persistent/.
+   https://sheurich.github.io/draft-sheurich-acme-dns-persist/draft-
+   sheurich-acme-dns-persist.html.  Status information for this document
+   may be found at https://datatracker.ietf.org/doc/draft-sheurich-acme-
+   dns-persist/.
 
    Discussion of this document takes place on the Automated Certificate
    Management Environment Working Group mailing list
@@ -43,7 +43,7 @@ About This Document
    https://www.ietf.org/mailman/listinfo/acme/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/sheurich/draft-sheurich-acme-dns-persistent.
+   https://github.com/sheurich/draft-sheurich-acme-dns-persist.
 
 Status of This Memo
 
@@ -81,7 +81,7 @@ Table of Contents
    1.  Introduction
      1.1.  Relationship to CA/Browser Forum Requirements
    2.  Conventions and Definitions
-   3.  The "dns-persistent-01" Challenge
+   3.  The "dns-persist-01" Challenge
      3.1.  Challenge Object
    4.  Challenge Response and Verification
      4.1.  Multi-Perspective Validation
@@ -134,11 +134,10 @@ Table of Contents
    *  Environments with strict change management processes where DNS
       modifications require approval workflows.
 
-   This document defines a new ACME challenge type, "dns-persistent-01".
+   This document defines a new ACME challenge type, "dns-persist-01".
    This method proves control over a Fully Qualified Domain Name (FQDN)
-   by having the applicant provision a DNS TXT record at a specific
-   subdomain that contains persistent validation information linking the
-   domain to both the Certificate Authority and the applicant's account.
+   by confirming the presence of a persistent DNS TXT record containing
+   CA and account identification information.
 
    The record format is based on the "issue-value" syntax from
    [RFC8659], incorporating an issuer-domain-name and a mandatory
@@ -181,27 +180,27 @@ Table of Contents
    on validation data, as defined by the CA's practices and applicable
    requirements.
 
-3.  The "dns-persistent-01" Challenge
+3.  The "dns-persist-01" Challenge
 
-   The "dns-persistent-01" challenge allows an ACME client to
-   demonstrate control over an FQDN by proving it can provision a DNS
-   TXT record containing specific, persistent validation information.
-   The validation information links the FQDN to both the Certificate
+   The "dns-persist-01" challenge allows an ACME client to demonstrate
+   control over an FQDN by proving it can provision a DNS TXT record
+   containing specific, persistent validation information.  The
+   validation information links the FQDN to both the Certificate
    Authority performing the validation and the specific ACME account
    requesting the validation.
 
-   When an ACME client accepts a "dns-persistent-01" challenge, it
-   proves control by provisioning a DNS TXT record at the Authorization
-   Domain Name.  Unlike the existing "dns-01" challenge, this record is
+   When an ACME client accepts a "dns-persist-01" challenge, it proves
+   control by provisioning a DNS TXT record at the Authorization Domain
+   Name.  Unlike the existing "dns-01" challenge, this record is
    designed to persist and may be reused for multiple certificate
    issuances over an extended period.
 
 3.1.  Challenge Object
 
-   The challenge object for "dns-persistent-01" contains the following
+   The challenge object for "dns-persist-01" contains the following
    fields:
 
-   *  *type* (required, string): The string "dns-persistent-01"
+   *  *type* (required, string): The string "dns-persist-01"
 
    *  *url* (required, string): The URL to which a response can be
       posted
@@ -213,7 +212,7 @@ Table of Contents
 
    Example challenge object:
 
-   json { "type": "dns-persistent-01", "url": "https://ca.example/acme/
+   json { "type": "dns-persist-01", "url": "https://ca.example/acme/
    authz/1234/0", "status": "pending", "issuer-domain-name":
    "authority.example" }
 
@@ -257,7 +256,7 @@ Table of Contents
 
 4.1.  Multi-Perspective Validation
 
-   CAs performing validations using the "dns-persistent-01" method MUST
+   CAs performing validations using the "dns-persist-01" method MUST
    implement Multi-Perspective Issuance Corroboration.  To count as
    corroborating, a Network Perspective MUST observe the same challenge
    information as the Primary Network Perspective.
@@ -394,7 +393,7 @@ Table of Contents
    IANA is requested to register the following entry in the "ACME
    Validation Methods" registry:
 
-   *  *Label*: dns-persistent-01
+   *  *Label*: dns-persist-01
 
    *  *Identifier Type*: dns
 
@@ -460,7 +459,7 @@ Table of Contents
    For validation of "example.com" by a CA using "authority.example" as
    its Issuer Domain Name:
 
-   1.  CA provides challenge object: json { "type": "dns-persistent-01",
+   1.  CA provides challenge object: json { "type": "dns-persist-01",
        "url": "https://ca.example/acme/authz/1234/0", "status":
        "pending", "issuer-domain-name": "authority.example" }
 
