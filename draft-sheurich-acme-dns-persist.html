@@ -1241,7 +1241,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
             <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-acknowledgments-numberedfal" class="internal xref">Acknowledgments {:numbered="false"}</a></p>
@@ -1284,7 +1292,22 @@ svg :is([fill="white"], [fill^="#fff"]) {
         <h3 id="name-relationship-to-ca-browser-">
 <a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-relationship-to-ca-browser-" class="section-name selfRef">Relationship to CA/Browser Forum Requirements</a>
         </h3>
-<p id="section-1.1-1">This validation method is designed to fulfill the requirements specified in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation. Certification Authorities implementing this method MUST comply with both this specification and the applicable Baseline Requirements, including requirements for Multi-Perspective Issuance Corroboration and validation data reuse periods.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-1">This validation method is designed to align with industry practices for persistent DNS TXT record validation, such as those described in the CA/Browser Forum Baseline Requirements <span>[<a href="#CABF-BR" class="cite xref">CABF-BR</a>]</span>. The following key requirements are incorporated directly into this specification:<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-1.1-2">
+<li id="section-1.1-2.1">
+            <p id="section-1.1-2.1.1">Use of the "_validation-persist" DNS label as the Authorization Domain Name prefix<a href="#section-1.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-1.1-2.2">
+            <p id="section-1.1-2.2.1">Multi-Perspective Validation requirements (see Section 4.1)<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-1.1-2.3">
+            <p id="section-1.1-2.3.1">Validation Data Reuse periods based on TTL values (see Section 4.2)<a href="#section-1.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-1.1-2.4">
+            <p id="section-1.1-2.4.1">Explicit account binding through the accounturi parameter<a href="#section-1.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-1.1-3">Certification Authorities implementing this method MUST comply with this specification and MAY additionally need to comply with other applicable industry requirements depending on their trust program participation.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1300,7 +1323,7 @@ NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
 appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <p id="section-2-2"><strong>Authorization Domain Name</strong>: The domain name formed by prepending the DNS TXT Record Persistent DCV Domain Label to the domain name being validated.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3"><strong>DNS TXT Record Persistent DCV Domain Label</strong>: The label "_validation-persist" as defined in Appendix A of the CA/Browser Forum Baseline Requirements.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-3"><strong>DNS TXT Record Persistent DCV Domain Label</strong>: The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.<a href="#section-2-3" class="pilcrow">¶</a></p>
 <p id="section-2-4"><strong>Issuer Domain Name</strong>: A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.<a href="#section-2-4" class="pilcrow">¶</a></p>
 <p id="section-2-5"><strong>Validation Data Reuse Period</strong>: The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.<a href="#section-2-5" class="pilcrow">¶</a></p>
 </section>
@@ -1378,7 +1401,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 </li>
       </ul>
 <p id="section-4-6">CAs MUST parse the issue-value string by first separating semicolon-separated fields, then parsing each field as either a domain name (for the issuer-domain-name) or a key=value pair (for accounturi and policy parameters).<a href="#section-4-6" class="pilcrow">¶</a></p>
-<p id="section-4-7">If the <code>policy</code> parameter is absent, the validation MUST only apply to the specific FQDN for which the record is set. If the <code>policy</code> parameter is present but contains a value not defined in this specification for scope modification, CAs MUST ignore the entire policy parameter and treat the validation as applying only to the specific FQDN. CAs MUST ignore unknown parameter keys not defined in this specification.<a href="#section-4-7" class="pilcrow">¶</a></p>
+<p id="section-4-7">If the <code>policy</code> parameter is absent, the validation MUST only apply to the specific FQDN for which the record is set. If the <code>policy</code> parameter is present but contains a value not defined in this specification (i.e., any value other than <code>specific-subdomains-only</code> or <code>wildcard-allowed</code>), CAs MUST ignore the entire policy parameter and treat the validation as applying only to the specific FQDN. CAs MUST ignore unknown parameter keys not defined in this specification.<a href="#section-4-7" class="pilcrow">¶</a></p>
 <p id="section-4-8">For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:<a href="#section-4-8" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4-9">
 <pre>
@@ -1442,7 +1465,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
       </ul>
 <p id="section-6-5">If the <code>policy</code> parameter is absent, or if it is present but does not authorize subdomain validation (e.g., a future policy value for a different purpose), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.<a href="#section-6-5" class="pilcrow">¶</a></p>
 <p id="section-6-6"><strong>Security Warning</strong>: Enabling subdomain validation via <code>policy=specific-subdomains-only</code> or <code>policy=wildcard-allowed</code> creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7">For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "other-dept.example.com" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-7">For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "dept.example.org" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.<a href="#section-6-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1479,21 +1502,26 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-account-binding-security" class="section-name selfRef">Account Binding Security</a>
         </h3>
 <p id="section-7.2-1">The <code>accounturi</code> parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">CAs SHOULD implement robust account security measures, including:<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">More specifically, if the ACME account key is compromised, an attacker can immediately use any pre-existing <code>dns-persist-01</code> authorizations for that account to issue certificates without requiring any additional access to DNS infrastructure. This represents a significant risk given the persistent nature of these validation records.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">CAs SHOULD implement robust account security measures, including:<a href="#section-7.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.2-3.1">
-            <p id="section-7.2-3.1.1">Strong authentication requirements for ACME accounts<a href="#section-7.2-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7.2-4.1">
+            <p id="section-7.2-4.1.1">Strong authentication requirements for ACME accounts<a href="#section-7.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.2">
-            <p id="section-7.2-3.2.1">Account activity monitoring and anomaly detection<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.2-4.2">
+            <p id="section-7.2-4.2.1">Account activity monitoring and anomaly detection<a href="#section-7.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.3">
-            <p id="section-7.2-3.3.1">Rapid account revocation capabilities<a href="#section-7.2-3.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.2-4.3">
+            <p id="section-7.2-4.3.1">Rapid account revocation capabilities<a href="#section-7.2-4.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-7.2-3.4">
-            <p id="section-7.2-3.4.1">Regular account security reviews<a href="#section-7.2-3.4.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-7.2-4.4">
+            <p id="section-7.2-4.4.1">Regular account security reviews<a href="#section-7.2-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-4.5">
+            <p id="section-7.2-4.5.1">Account key rotation policies and procedures<a href="#section-7.2-4.5.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
+<p id="section-7.2-5">Clients SHOULD protect their ACME account keys with the same level of security as they would protect private keys for high-value certificates.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="subdomain-validation-risks">
@@ -1545,6 +1573,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-record-tampering-and-integr" class="section-name selfRef">Record Tampering and Integrity</a>
         </h3>
 <p id="section-7.5-1">DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">Additionally, if an attacker could compromise the DNS infrastructure for a CA's <code>issuer-domain-name</code> (e.g., <code>authority.example</code>), they could potentially create confusion about CA identity, although this represents a systemic risk that extends beyond this specific validation method. CAs SHOULD protect their issuer domain names with appropriate DNS security measures.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1754,41 +1783,61 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 </div>
 </section>
 </div>
-<div id="sec-normative-references">
+<div id="sec-combined-references">
 <section id="section-11">
-      <h2 id="name-normative-references">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+      <h2 id="name-references">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
+<div id="sec-normative-references">
+<section id="section-11.1">
+        <h3 id="name-normative-references">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
 <dl class="references">
 <dt id="RFC1034">[RFC1034]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Mockapetris, P.</span>, <span class="refTitle">"Domain names - concepts and facilities"</span>, <span class="seriesInfo">STD 13</span>, <span class="seriesInfo">RFC 1034</span>, <span class="seriesInfo">DOI 10.17487/RFC1034</span>, <time datetime="1987-11" class="refDate">November 1987</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1034">https://www.rfc-editor.org/rfc/rfc1034</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC1035">[RFC1035]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Mockapetris, P.</span>, <span class="refTitle">"Domain names - implementation and specification"</span>, <span class="seriesInfo">STD 13</span>, <span class="seriesInfo">RFC 1035</span>, <span class="seriesInfo">DOI 10.17487/RFC1035</span>, <time datetime="1987-11" class="refDate">November 1987</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1035">https://www.rfc-editor.org/rfc/rfc1035</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8555">[RFC8555]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Barnes, R.</span>, <span class="refAuthor">Hoffman-Andrews, J.</span>, <span class="refAuthor">McCarney, D.</span>, and <span class="refAuthor">J. Kasten</span>, <span class="refTitle">"Automatic Certificate Management Environment (ACME)"</span>, <span class="seriesInfo">RFC 8555</span>, <span class="seriesInfo">DOI 10.17487/RFC8555</span>, <time datetime="2019-03" class="refDate">March 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8555">https://www.rfc-editor.org/rfc/rfc8555</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8657">[RFC8657]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Landau, H.</span>, <span class="refTitle">"Certification Authority Authorization (CAA) Record Extensions for Account URI and Automatic Certificate Management Environment (ACME) Method Binding"</span>, <span class="seriesInfo">RFC 8657</span>, <span class="seriesInfo">DOI 10.17487/RFC8657</span>, <time datetime="2019-11" class="refDate">November 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8657">https://www.rfc-editor.org/rfc/rfc8657</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8659">[RFC8659]</dt>
-    <dd>
+      <dd>
 <span class="refAuthor">Hallam-Baker, P.</span>, <span class="refAuthor">Stradling, R.</span>, and <span class="refAuthor">J. Hoffman-Andrews</span>, <span class="refTitle">"DNS Certification Authority Authorization (CAA) Resource Record"</span>, <span class="seriesInfo">RFC 8659</span>, <span class="seriesInfo">DOI 10.17487/RFC8659</span>, <time datetime="2019-11" class="refDate">November 2019</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8659">https://www.rfc-editor.org/rfc/rfc8659</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-11.2">
+        <h3 id="name-informative-references">
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="CABF-BR">[CABF-BR]</dt>
+      <dd>
+<span class="refAuthor">CA/Browser Forum</span>, <span class="refTitle">"Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://cabforum.org/baseline-requirements-documents/">https://cabforum.org/baseline-requirements-documents/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
 </section>
 </div>
 <div id="acknowledgments-numberedfalse">
@@ -1797,8 +1846,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-acknowledgments-numberedfal" class="section-name selfRef">Acknowledgments {:numbered="false"}</a>
       </h2>
 <p id="appendix-A-1">The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">Thanks to the contributors and reviewers who provided feedback on early versions of this document.
-Thanks to the contributors and reviewers who provided feedback on early versions of this document.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Thanks to the contributors and reviewers who provided feedback on early versions of this document.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
