@@ -37,14 +37,14 @@ normative:
   RFC8555:
   RFC8657:
   RFC8659:
+
+informative:
   CABF-BR:
     title: "Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates"
     author:
       org: "CA/Browser Forum"
     date: 2024
     target: "https://cabforum.org/baseline-requirements-documents/"
-
-informative:
 
 --- abstract
 
@@ -70,7 +70,14 @@ The record format is based on the "issue-value" syntax from {{RFC8659}}, incorpo
 
 ## Relationship to CA/Browser Forum Requirements {#relationship-to-cabf}
 
-This validation method is designed to fulfill the requirements specified in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements {{CABF-BR}} for persistent DNS TXT record validation. Certification Authorities implementing this method MUST comply with both this specification and the applicable Baseline Requirements, including requirements for Multi-Perspective Issuance Corroboration and validation data reuse periods.
+This validation method is designed to align with industry practices for persistent DNS TXT record validation, such as those described in the CA/Browser Forum Baseline Requirements {{CABF-BR}}. The following key requirements are incorporated directly into this specification:
+
+1. Use of the "_validation-persist" DNS label as the Authorization Domain Name prefix
+2. Multi-Perspective Validation requirements (see Section 4.1)
+3. Validation Data Reuse periods based on TTL values (see Section 4.2)
+4. Explicit account binding through the accounturi parameter
+
+Certification Authorities implementing this method MUST comply with this specification and MAY additionally need to comply with other applicable industry requirements depending on their trust program participation.
 
 # Conventions and Definitions {#conventions-and-definitions}
 
@@ -78,7 +85,7 @@ This validation method is designed to fulfill the requirements specified in Sect
 
 **Authorization Domain Name**: The domain name formed by prepending the DNS TXT Record Persistent DCV Domain Label to the domain name being validated.
 
-**DNS TXT Record Persistent DCV Domain Label**: The label "_validation-persist" as defined in Appendix A of the CA/Browser Forum Baseline Requirements.
+**DNS TXT Record Persistent DCV Domain Label**: The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
 
 **Issuer Domain Name**: A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
 
