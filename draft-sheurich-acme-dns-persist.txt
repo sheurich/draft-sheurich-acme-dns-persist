@@ -14,8 +14,8 @@ Expires: 12 December 2025
 
 Abstract
 
-   This document specifies "dns-persistent-01", a new validation method
-   for the Automated Certificate Management Environment (ACME) protocol.
+   This document specifies "dns-persist-01", a new validation method for
+   the Automated Certificate Management Environment (ACME) protocol.
    This method allows a Certification Authority (CA) to verify control
    over a domain by confirming the presence of a persistent DNS TXT
    record containing CA and account identification information.  This
