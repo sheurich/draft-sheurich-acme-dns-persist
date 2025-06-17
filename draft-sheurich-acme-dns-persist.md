@@ -1,7 +1,7 @@
 ---
 title: "Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation"
 abbrev: "ACME Persistent DNS Challenge"
-category: info
+category: std
 
 docname: draft-sheurich-acme-dns-persist-latest
 submissiontype: IETF
@@ -12,10 +12,11 @@ v: 3
 area: "Security"
 workgroup: "Automated Certificate Management Environment"
 keyword:
-  - acme
-  - dns
-  - validation
-  - persistent
+ - acme
+ - dns
+ - validation
+ - persistent
+
 venue:
   group: "Automated Certificate Management Environment"
   type: "Working Group"
@@ -25,9 +26,10 @@ venue:
   latest: "https://sheurich.github.io/draft-sheurich-acme-dns-persist/draft-sheurich-acme-dns-persist.html"
 
 author:
-  - fullname: "Shiloh Heurich"
-    organization: Fastly
-    email: "sheurich@fastly.com"
+ -
+   fullname: "Shiloh Heurich"
+   organization: Fastly
+   email: "sheurich@fastly.com"
 
 normative:
   RFC1034:
@@ -44,7 +46,7 @@ This document specifies "dns-persist-01", a new validation method for the Automa
 
 --- middle
 
-# Introduction
+# Introduction {#introduction}
 
 The Automated Certificate Management Environment (ACME) protocol {{RFC8555}} defines mechanisms for automating certificate issuance and domain validation. The existing challenge methods, "http-01" and "dns-01", require real-time interaction between the ACME client and the domain's infrastructure during the validation process. While effective for many use cases, these methods present challenges in certain deployment scenarios.
 
@@ -60,13 +62,13 @@ This document defines a new ACME challenge type, "dns-persist-01". This method p
 
 The record format is based on the "issue-value" syntax from {{RFC8659}}, incorporating an issuer-domain-name and a mandatory accounturi parameter {{RFC8657}} that uniquely identifies the applicant's account. This design provides strong binding between the domain, the CA, and the specific account requesting validation.
 
-## Relationship to CA/Browser Forum Requirements
+## Relationship to CA/Browser Forum Requirements {#relationship-to-cabf}
 
 This validation method is designed to fulfill the requirements specified in Section 3.2.2.4.22 of the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation. Certification Authorities implementing this method MUST comply with both this specification and the applicable Baseline Requirements, including requirements for Multi-Perspective Issuance Corroboration and validation data reuse periods.
 
-# Conventions and Definitions
+# Conventions and Definitions {#conventions-and-definitions}
 
-{::boilerplate bcp14-tagged}
+{::boilerplate bcp14}
 
 **Authorization Domain Name**: The domain name formed by prepending the DNS TXT Record Persistent DCV Domain Label to the domain name being validated.
 
@@ -76,13 +78,13 @@ This validation method is designed to fulfill the requirements specified in Sect
 
 **Validation Data Reuse Period**: The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
-# The "dns-persist-01" Challenge
+# The "dns-persist-01" Challenge {#dns-persist-01-challenge}
 
 The "dns-persist-01" challenge allows an ACME client to demonstrate control over an FQDN by proving it can provision a DNS TXT record containing specific, persistent validation information. The validation information links the FQDN to both the Certificate Authority performing the validation and the specific ACME account requesting the validation.
 
 When an ACME client accepts a "dns-persist-01" challenge, it proves control by provisioning a DNS TXT record at the Authorization Domain Name. Unlike the existing "dns-01" challenge, this record is designed to persist and may be reused for multiple certificate issuances over an extended period.
 
-## Challenge Object
+## Challenge Object {#challenge-object}
 
 The challenge object for "dns-persist-01" contains the following fields:
 
@@ -102,7 +104,7 @@ Example challenge object:
 }
 ~~~
 
-# Challenge Response and Verification
+# Challenge Response and Verification {#challenge-response-and-verification}
 
 To respond to the challenge, the ACME client provisions a DNS TXT record for the Authorization Domain Name being validated. The Authorization Domain Name is formed by prepending the label "_validation-persist" to the domain name being validated.
 
@@ -140,23 +142,23 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account. The server also interprets any `policy` parameter values according to this specification.
 
-## Multi-Perspective Validation
+## Multi-Perspective Validation {#multi-perspective-validation}
 
 CAs performing validations using the "dns-persist-01" method MUST implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective MUST observe the same challenge information as the Primary Network Perspective.
 
-## Validation Data Reuse and TTL Handling
+## Validation Data Reuse and TTL Handling {#validation-data-reuse-and-ttl}
 
 This validation method is explicitly designed for persistence and reuse. If the DNS TXT record has a Time-to-Live (TTL) that is less than the CA's defined validation data reuse period, then the CA MUST consider the validation data reuse period to be equal to the TTL or 8 hours, whichever is greater.
 
 CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described above.
 
-# Wildcard Certificate Validation
+# Wildcard Certificate Validation {#wildcard-certificate-validation}
 
 This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard-allowed` parameter value.
 
 When such a record is present (i.e., containing `policy=wildcard-allowed`), it can validate the base domain, specific subdomains, and wildcard certificates for that domain. For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard-allowed` can validate certificates for `example.com`, `www.example.com`, and `*.example.com`. If the `policy` parameter is absent or set to `specific-subdomains-only`, the validation is not sufficient for `*.example.com`.
 
-# Subdomain Certificate Validation
+# Subdomain Certificate Validation {#subdomain-certificate-validation}
 
 If an FQDN has been successfully validated using this method, the CA MAY also consider this validation sufficient for issuing certificates for other FQDNs that are subdomains of the validated FQDN, under the following conditions:
 
@@ -174,9 +176,9 @@ If the `policy` parameter is absent, or if it is present but does not authorize 
 
 For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "other-dept.example.com" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.
 
-# Security Considerations
+# Security Considerations {#security-considerations}
 
-## Persistent Record Risks
+## Persistent Record Risks {#persistent-record-risks}
 
 The persistence of validation records creates extended windows of vulnerability compared to traditional ACME challenge methods. If an attacker gains control of a DNS zone containing persistent validation records, they can potentially obtain certificates for the validated domains until the validation records are removed or modified.
 
@@ -187,7 +189,7 @@ Clients SHOULD protect validation records through appropriate DNS security measu
 - Monitoring DNS zones for unauthorized changes
 - Regularly reviewing and rotating validation records
 
-## Account Binding Security
+## Account Binding Security {#account-binding-security}
 
 The `accounturi` parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.
 
@@ -198,7 +200,7 @@ CAs SHOULD implement robust account security measures, including:
 - Rapid account revocation capabilities
 - Regular account security reviews
 
-## Subdomain Validation Risks
+## Subdomain Validation Risks {#subdomain-validation-risks}
 
 The ability to issue certificates for subdomains of validated FQDNs creates significant security risks, particularly in environments with subdomain delegation or where subdomains may be controlled by different entities.
 
@@ -215,17 +217,17 @@ Organizations considering the use of subdomain validation MUST:
 - Consider limiting subdomain validation to specific, controlled scenarios
 - Provide clear governance policies for subdomain certificate authority
 
-## Cross-CA Validation Reuse
+## Cross-CA Validation Reuse {#cross-ca-validation-reuse}
 
 The persistent nature of validation records raises concerns about potential reuse across different Certificate Authorities. While the issuer-domain-name parameter is designed to prevent such reuse, implementations MUST carefully validate that the issuer-domain-name in the DNS record matches the CA's disclosed Issuer Domain Name.
 
-## Record Tampering and Integrity
+## Record Tampering and Integrity {#record-tampering-and-integrity}
 
 DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.
 
-# IANA Considerations
+# IANA Considerations {#iana-considerations}
 
-## ACME Validation Methods Registry
+## ACME Validation Methods Registry {#acme-validation-methods-registry}
 
 IANA is requested to register the following entry in the "ACME Validation Methods" registry:
 
@@ -234,9 +236,9 @@ IANA is requested to register the following entry in the "ACME Validation Method
 - **ACME**: Y
 - **Reference**: This document
 
-# Implementation Considerations
+# Implementation Considerations {#implementation-considerations}
 
-## CA Implementation Guidelines
+## CA Implementation Guidelines {#ca-implementation-guidelines}
 
 Certificate Authorities implementing this validation method should consider:
 
@@ -246,7 +248,7 @@ Certificate Authorities implementing this validation method should consider:
 - Creating account security monitoring and incident response procedures
 - Providing clear documentation for clients on proper record construction
 
-## Client Implementation Guidelines
+## Client Implementation Guidelines {#client-implementation-guidelines}
 
 ACME clients implementing this validation method should consider:
 
@@ -256,7 +258,7 @@ ACME clients implementing this validation method should consider:
 - Designing appropriate error handling for validation failures
 - Considering the security implications of persistent records in their threat models
 
-## DNS Provider Considerations
+## DNS Provider Considerations {#dns-provider-considerations}
 
 DNS providers supporting this validation method should consider:
 
@@ -265,9 +267,9 @@ DNS providers supporting this validation method should consider:
 - Supporting reasonable TTL values for validation records
 - Considering dedicated interfaces or APIs for ACME validation record management
 
-# Examples
+# Examples {#examples}
 
-## Basic Validation Example (FQDN Only)
+## Basic Validation Example (FQDN Only) {#basic-validation-example}
 
 For validation of "example.com" by a CA using "authority.example" as its Issuer Domain Name, where the validation should only apply to "example.com":
 
@@ -290,7 +292,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 3. CA validates the record through multi-perspective DNS queries. This validation is sufficient only for "example.com".
 
-## Specific Subdomain Validation Example
+## Specific Subdomain Validation Example {#specific-subdomain-validation-example}
 
 For validation of "example.com" and its specific subdomains (e.g., "www.example.com", "api.example.com"), but NOT for "*.example.com", by a CA using "authority.example":
 
@@ -304,7 +306,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 3. CA validates the record. This validation authorizes certificates for "example.com" and specific subdomains like "www.example.com", but not for "*.example.com".
 
-## Wildcard Validation Example
+## Wildcard Validation Example {#wildcard-validation-example}
 
 For validation of "*.example.com" (which also validates "example.com" and specific subdomains like "www.example.com") by a CA using "authority.example" as its Issuer Domain Name:
 
@@ -320,9 +322,9 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 --- back
 
-# Acknowledgments
-{:numbered="false"}
+# Acknowledgments {:numbered="false"}
 
 The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.
 
+Thanks to the contributors and reviewers who provided feedback on early versions of this document.
 Thanks to the contributors and reviewers who provided feedback on early versions of this document.
