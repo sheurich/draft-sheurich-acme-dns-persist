@@ -116,13 +116,29 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 3. The issue-value MUST contain an accounturi parameter. The value of this parameter MUST be a unique URI identifying the account of the applicant which requested the validation, constructed according to {{RFC8657}}, Section 3.
 
-For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", it would provision the following DNS TXT record:
+4. The issue-value MAY contain a `policy` parameter. If present, this parameter modifies the validation scope. The `policy` parameter follows the `key=value` syntax. The policy parameter key and its defined values MUST be treated as case-insensitive. The following values for the `policy` parameter are defined with respect to subdomain and wildcard validation:
+
+- `policy=specific-subdomains-only`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN and for specific subdomains of the validated FQDN, as described in the "Subdomain Certificate Validation" section. This policy value explicitly does NOT authorize wildcard certificates.
+
+- `policy=wildcard-allowed`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See "Wildcard Certificate Validation" and "Subdomain Certificate Validation" sections.
+
+CAs MUST parse the issue-value string by first separating semicolon-separated fields, then parsing each field as either a domain name (for the issuer-domain-name) or a key=value pair (for accounturi and policy parameters).
+
+If the `policy` parameter is absent, the validation MUST only apply to the specific FQDN for which the record is set. If the `policy` parameter is present but contains a value not defined in this specification for scope modification, CAs MUST ignore the entire policy parameter and treat the validation as applying only to the specific FQDN. CAs MUST ignore unknown parameter keys not defined in this specification.
+
+For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
+
+```
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=specific-subdomains-only"
+```
+
+If no policy parameter is included, the record defaults to FQDN-only validation:
 
 ```
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ```
 
-The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account.
+The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account. The server also interprets any `policy` parameter values according to this specification.
 
 ## Multi-Perspective Validation
 
@@ -136,17 +152,27 @@ CAs MAY reuse validation data obtained through this method for the duration of t
 
 # Wildcard Certificate Validation
 
-This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). A single DNS TXT record placed at the Authorization Domain Name can validate both the base domain and wildcard certificates for that domain.
+This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard-allowed` parameter value.
 
-For example, a TXT record at "_validation-persist.example.com" can validate certificates for both "example.com" and "*.example.com".
+When such a record is present (i.e., containing `policy=wildcard-allowed`), it can validate the base domain, specific subdomains, and wildcard certificates for that domain. For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard-allowed` can validate certificates for `example.com`, `www.example.com`, and `*.example.com`. If the `policy` parameter is absent or set to `specific-subdomains-only`, the validation is not sufficient for `*.example.com`.
 
 # Subdomain Certificate Validation
 
-Once an FQDN has been successfully validated using this method, the CA MAY also consider this validation sufficient for issuing certificates for other FQDNs that are subdomains of the validated FQDN, provided that all the Domain Labels of the validated FQDN appear as a suffix in the certificate subject.
+If an FQDN has been successfully validated using this method, the CA MAY also consider this validation sufficient for issuing certificates for other FQDNs that are subdomains of the validated FQDN, under the following conditions:
 
-**Security Warning**: This capability creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. CAs SHOULD provide mechanisms for domain owners to opt out of subdomain validation or limit its scope.
+- The persistent DNS TXT record MUST include either `policy=specific-subdomains-only` or `policy=wildcard-allowed`.
 
-For example, validation of "dept.example.com" could authorize certificates for "server.dept.example.com" but would not authorize certificates for "other-dept.example.com".
+To determine which subdomains are permitted, the FQDN for which the persistent TXT record exists (the "validated FQDN") must appear as the exact suffix of the FQDN for which a certificate is requested (the "requested FQDN"). For example, if `dept.example.com` is the validated FQDN, a certificate for `server.dept.example.com` is permitted because `dept.example.com` is its suffix. This subdomain validation differs from the wildcard policy primarily in scope:
+
+- With `policy=specific-subdomains-only` on the validated FQDN, certificates can be issued for the validated FQDN itself and its specific subdomains (per the suffix rule), but explicitly NOT for a wildcard covering those subdomains (e.g., `*.dept.example.com`).
+
+- With `policy=wildcard-allowed` on the validated FQDN, certificates can be issued for the validated FQDN, its specific subdomains (per the suffix rule), AND for a wildcard covering those subdomains (e.g., `*.dept.example.com`). The "Wildcard Certificate Validation" section further details how `policy=wildcard-allowed` is typically used on a base domain to authorize certificates like `*.example.com`.
+
+If the `policy` parameter is absent, or if it is present but does not authorize subdomain validation (e.g., a future policy value for a different purpose), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.
+
+**Security Warning**: Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
+
+For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "other-dept.example.com" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.
 
 # Security Considerations
 
@@ -241,9 +267,9 @@ DNS providers supporting this validation method should consider:
 
 # Examples
 
-## Basic Validation Example
+## Basic Validation Example (FQDN Only)
 
-For validation of "example.com" by a CA using "authority.example" as its Issuer Domain Name:
+For validation of "example.com" by a CA using "authority.example" as its Issuer Domain Name, where the validation should only apply to "example.com":
 
 1. CA provides challenge object:
 ```json
@@ -255,20 +281,38 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 }
 ```
 
-2. Client provisions DNS TXT record:
+2. Client provisions DNS TXT record (note the absence of a `policy` parameter for scope):
 ```
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ```
 
-3. CA validates the record through multi-perspective DNS queries
+3. CA validates the record through multi-perspective DNS queries. This validation is sufficient only for "example.com".
+
+## Specific Subdomain Validation Example
+
+For validation of "example.com" and its specific subdomains (e.g., "www.example.com", "api.example.com"), but NOT for "*.example.com", by a CA using "authority.example":
+
+1. Same challenge object format as above.
+
+2. Client provisions DNS TXT record including `policy=specific-subdomains-only`:
+```
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=specific-subdomains-only"
+```
+
+3. CA validates the record. This validation authorizes certificates for "example.com" and specific subdomains like "www.example.com", but not for "*.example.com".
 
 ## Wildcard Validation Example
 
-For validation of "*.example.com":
+For validation of "*.example.com" (which also validates "example.com" and specific subdomains like "www.example.com") by a CA using "authority.example" as its Issuer Domain Name:
 
-1. Same challenge object format as above
-2. Same DNS TXT record placement at "_validation-persist.example.com"
-3. Validation authorizes both "example.com" and "*.example.com" certificates
+1. Same challenge object format as above.
+
+2. Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard-allowed`:
+```
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard-allowed"
+```
+
+3. CA validates the record through multi-perspective DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
 
 --- back
 
