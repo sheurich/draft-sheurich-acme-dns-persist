@@ -31,13 +31,6 @@ author:
    organization: Fastly
    email: "sheurich@fastly.com"
 
-normative:
-  RFC1034:
-  RFC1035:
-  RFC8555:
-  RFC8657:
-  RFC8659:
-
 informative:
   CABF-BR:
     title: "Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates"
@@ -54,7 +47,7 @@ This document specifies "dns-persist-01", a new validation method for the Automa
 
 # Introduction {#introduction}
 
-The Automated Certificate Management Environment (ACME) protocol {{RFC8555}} defines mechanisms for automating certificate issuance and domain validation. The existing challenge methods, "http-01" and "dns-01", require real-time interaction between the ACME client and the domain's infrastructure during the validation process. While effective for many use cases, these methods present challenges in certain deployment scenarios.
+The Automated Certificate Management Environment (ACME) protocol {{!RFC8555}} defines mechanisms for automating certificate issuance and domain validation. The existing challenge methods, "http-01" and "dns-01", require real-time interaction between the ACME client and the domain's infrastructure during the validation process. While effective for many use cases, these methods present challenges in certain deployment scenarios.
 
 Examples include:
 
@@ -66,7 +59,7 @@ Examples include:
 
 This document defines a new ACME challenge type, "dns-persist-01". This method proves control over a Fully Qualified Domain Name (FQDN) by confirming the presence of a persistent DNS TXT record containing CA and account identification information.
 
-The record format is based on the "issue-value" syntax from {{RFC8659}}, incorporating an issuer-domain-name and a mandatory accounturi parameter {{RFC8657}} that uniquely identifies the applicant's account. This design provides strong binding between the domain, the CA, and the specific account requesting validation.
+The record format is based on the "issue-value" syntax from {{!RFC8659}}, incorporating an issuer-domain-name and a mandatory accounturi parameter {{!RFC8657}} that uniquely identifies the applicant's account. This design provides strong binding between the domain, the CA, and the specific account requesting validation.
 
 ## Relationship to CA/Browser Forum Requirements {#relationship-to-cabf}
 
@@ -89,7 +82,7 @@ Authorization Domain Name
 DNS TXT Record Persistent DCV Domain Label
 : The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
 
-Issuer Domain Name**
+Issuer Domain Name
 : A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
 
 Validation Data Reuse Period
@@ -129,11 +122,11 @@ For example, if the domain being validated is "example.com", the Authorization D
 
 The RDATA of this TXT record MUST fulfill the following requirements:
 
-1. The RDATA value MUST conform to the issue-value syntax as defined in {{RFC8659}}, Section 4.
+1. The RDATA value MUST conform to the issue-value syntax as defined in {{!RFC8659}}, Section 4.
 
 2. The `issuer-domain-name` portion of the issue-value MUST be the Issuer Domain Name provided by the CA in the challenge object.
 
-3. The issue-value MUST contain an accounturi parameter. The value of this parameter MUST be a unique URI identifying the account of the applicant which requested the validation, constructed according to {{RFC8657}}, Section 3.
+3. The issue-value MUST contain an accounturi parameter. The value of this parameter MUST be a unique URI identifying the account of the applicant which requested the validation, constructed according to {{!RFC8657}}, Section 3.
 
 4. The issue-value MAY contain a `policy` parameter. If present, this parameter modifies the validation scope. The `policy` parameter follows the `key=value` syntax. The policy parameter key and its defined values MUST be treated as case-insensitive. The following values for the `policy` parameter are defined with respect to subdomain and wildcard validation:
 
@@ -141,7 +134,7 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 - `policy=wildcard-allowed`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
 
-The RDATA of this TXT record MUST be a string conforming to the 'issue-value' ABNF syntax defined in Section 4 of {{RFC8659}}. If the `policy` parameter is absent, the validation MUST apply only to the specific FQDN. If the `policy` parameter is present, its value MUST be treated case-insensitively. If the value is anything other than `specific-subdomains-only` or `wildcard-allowed`, the CA MUST proceed as if the policy parameter were not present. CAs MUST ignore any unknown parameter keys.
+The RDATA of this TXT record MUST be a string conforming to the 'issue-value' ABNF syntax defined in Section 4 of {{!RFC8659}}. If the `policy` parameter is absent, the validation MUST apply only to the specific FQDN. If the `policy` parameter is present, its value MUST be treated case-insensitively. If the value is anything other than `specific-subdomains-only` or `wildcard-allowed`, the CA MUST proceed as if the policy parameter were not present. CAs MUST ignore any unknown parameter keys.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
@@ -346,7 +339,8 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 --- back
 
-# Acknowledgments {:numbered="false"}
+# Acknowledgments
+{:numbered="false"}
 
 The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.
 
