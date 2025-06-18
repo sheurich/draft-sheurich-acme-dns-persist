@@ -73,8 +73,8 @@ The record format is based on the "issue-value" syntax from {{RFC8659}}, incorpo
 This validation method is designed to align with industry practices for persistent DNS TXT record validation, such as those described in the CA/Browser Forum Baseline Requirements {{CABF-BR}}. The following key requirements are incorporated directly into this specification:
 
 1. Use of the "_validation-persist" DNS label as the Authorization Domain Name prefix
-2. Multi-Perspective Validation requirements (see Section 4.1)
-3. Validation Data Reuse periods based on TTL values (see Section 4.2)
+2. Multi-Perspective Validation requirements (see {{multi-perspective-validation}})
+3. Validation Data Reuse periods based on TTL values (see {{validation-data-reuse-and-ttl}})
 4. Explicit account binding through the accounturi parameter
 
 Certification Authorities implementing this method MUST comply with this specification and MAY additionally need to comply with other applicable industry requirements depending on their trust program participation.
@@ -83,13 +83,17 @@ Certification Authorities implementing this method MUST comply with this specifi
 
 {::boilerplate bcp14}
 
-Authorization Domain Name: The domain name at which the validation TXT record is provisioned. It is formed by prepending the label "_validation-persist" to the FQDN being validated.
+Authorization Domain Name
+: The domain name at which the validation TXT record is provisioned. It is formed by prepending the label "_validation-persist" to the FQDN being validated.
 
-**DNS TXT Record Persistent DCV Domain Label**: The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
+**DNS TXT Record Persistent DCV Domain Label**
+: The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
 
-**Issuer Domain Name**: A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
+**Issuer Domain Name**
+: A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
 
-**Validation Data Reuse Period**: The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
+**Validation Data Reuse Period**
+: The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
 # The "dns-persist-01" Challenge {#dns-persist-01-challenge}
 
@@ -133,11 +137,11 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 4. The issue-value MAY contain a `policy` parameter. If present, this parameter modifies the validation scope. The `policy` parameter follows the `key=value` syntax. The policy parameter key and its defined values MUST be treated as case-insensitive. The following values for the `policy` parameter are defined with respect to subdomain and wildcard validation:
 
-- `policy=specific-subdomains-only`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN and for specific subdomains of the validated FQDN, as described in the "Subdomain Certificate Validation" section. This policy value explicitly does NOT authorize wildcard certificates.
+- `policy=specific-subdomains-only`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN and for specific subdomains of the validated FQDN, as described in {{subdomain-certificate-validation}}. This policy value explicitly does NOT authorize wildcard certificates.
 
-- `policy=wildcard-allowed`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See "Wildcard Certificate Validation" and "Subdomain Certificate Validation" sections.
+- `policy=wildcard-allowed`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
 
-The RDATA of this TXT record MUST be a string conforming to the 'issue-value' ABNF syntax defined in Section 4 of [RFC8659]. If the policy parameter is absent, the validation MUST apply only to the specific FQDN. If the policy parameter is present, its value MUST be treated case-insensitively. If the value is anything other than specific-subdomains-only or wildcard-allowed, the CA MUST proceed as if the policy parameter were not present. CAs MUST ignore any unknown parameter keys.
+The RDATA of this TXT record MUST be a string conforming to the 'issue-value' ABNF syntax defined in Section 4 of {{RFC8659}}. If the `policy` parameter is absent, the validation MUST apply only to the specific FQDN. If the `policy` parameter is present, its value MUST be treated case-insensitively. If the value is anything other than `specific-subdomains-only` or `wildcard-allowed`, the CA MUST proceed as if the policy parameter were not present. CAs MUST ignore any unknown parameter keys.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
@@ -183,7 +187,7 @@ To determine which subdomains are permitted, the FQDN for which the persistent T
 
 If the `policy` parameter is absent, or if it is present but does not authorize subdomain validation (e.g., a future policy value for a different purpose), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.
 
-**Security Warning**: See [Subdomain Validation Risks](#subdomain-validation-risks) for important security implications of enabling subdomain validation.
+See {{subdomain-validation-risks}} for important security implications of enabling subdomain validation.
 
 For a persistent TXT record provisioned at "_validation-persist.dept.example.com" with a 'policy' of 'specific-subdomains-only', a CA may issue a certificate for "server.dept.example.com" (since "dept.example.com" is the suffix). However, this validation MUST NOT be used to issue a certificate for "dept.example2.com" or "example.com".
 
@@ -202,9 +206,9 @@ Clients SHOULD protect validation records through appropriate DNS security measu
 
 ## Account Binding Security {#account-binding-security}
 
-The `accounturi` parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself. If an ACME account is compromised, attackers may be able to obtain certificates for domains with persistent validation records associated with that account.
+The `accounturi` parameter provides strong binding between domain validation and specific ACME accounts. However, this binding depends on the security of the ACME account itself.
 
-More specifically, if the ACME account key is compromised, an attacker can immediately use any pre-existing `dns-persist-01` authorizations for that account to issue certificates without requiring any additional access to DNS infrastructure. This represents a significant risk given the persistent nature of these validation records.
+The security of this method is fundamentally bound to the security of the ACME account's private key. If this key is compromised, an attacker can immediately use any pre-existing `dns-persist-01` authorizations associated with that account to issue certificates, without needing any further access to the domain's DNS infrastructure. This elevates the importance of secure key management for ACME clients far above that required for transient challenge methods, as the window of opportunity for an attacker is tied to the lifetime of the persistent authorization, not a momentary challenge.
 
 CAs SHOULD implement robust account security measures, including:
 
@@ -216,9 +220,9 @@ CAs SHOULD implement robust account security measures, including:
 
 Clients SHOULD protect their ACME account keys with the same level of security as they would protect private keys for high-value certificates.
 
-The security of this method is fundamentally bound to the security of the ACME account's private key. An attacker who compromises this key can immediately use all existing 'dns-persist-01' authorizations associated with that account to issue certificates until the authorizations are revoked. This elevates the importance of secure key management for ACME clients above that required for transient challenge methods.
-
 ## Subdomain Validation Risks {#subdomain-validation-risks}
+
+Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
 
 The ability to issue certificates for subdomains of validated FQDNs creates significant security risks, particularly in environments with subdomain delegation or where subdomains may be controlled by different entities.
 
@@ -235,8 +239,6 @@ Organizations considering the use of subdomain validation MUST:
 - Consider limiting subdomain validation to specific, controlled scenarios
 - Provide clear governance policies for subdomain certificate authority
 
-**Security Warning**: Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
-
 ## Cross-CA Validation Reuse {#cross-ca-validation-reuse}
 
 The persistent nature of validation records raises concerns about potential reuse across different Certificate Authorities. While the issuer-domain-name parameter is designed to prevent such reuse, implementations MUST carefully validate that the issuer-domain-name in the DNS record matches the CA's disclosed Issuer Domain Name.
@@ -245,7 +247,7 @@ The persistent nature of validation records raises concerns about potential reus
 
 DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.
 
-Additionally, if an attacker could compromise the DNS infrastructure for a CA's `issuer-domain-name` (e.g., `authority.example`), they could potentially create confusion about CA identity, although this represents a systemic risk that extends beyond this specific validation method. CAs SHOULD protect their issuer domain names with appropriate DNS security measures.
+Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures (such as DNSSEC). An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
 
 # IANA Considerations {#iana-considerations}
 
