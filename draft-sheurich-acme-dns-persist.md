@@ -86,13 +86,13 @@ Certification Authorities implementing this method MUST comply with this specifi
 Authorization Domain Name
 : The domain name at which the validation TXT record is provisioned. It is formed by prepending the label "_validation-persist" to the FQDN being validated.
 
-**DNS TXT Record Persistent DCV Domain Label**
+DNS TXT Record Persistent DCV Domain Label
 : The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
 
-**Issuer Domain Name**
+Issuer Domain Name**
 : A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
 
-**Validation Data Reuse Period**
+Validation Data Reuse Period
 : The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
 # The "dns-persist-01" Challenge {#dns-persist-01-challenge}
