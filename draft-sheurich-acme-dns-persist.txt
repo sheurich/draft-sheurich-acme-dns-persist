@@ -107,7 +107,7 @@ Table of Contents
    11. References
      11.1.  Normative References
      11.2.  Informative References
-   Appendix A.  Acknowledgments {:numbered="false"}
+   Acknowledgments
    Author's Address
 
 1.  Introduction
@@ -187,10 +187,10 @@ Table of Contents
       persist" as specified in this document.  This label is consistent
       with industry practices for persistent domain validation.
 
-   Issuer Domain Name**  A domain name disclosed by the CA in
-      Section 4.2 of the CA's Certificate Policy and/or Certification
-      Practices Statement to identify the CA for the purposes of this
-      validation method.
+   Issuer Domain Name  A domain name disclosed by the CA in Section 4.2
+      of the CA's Certificate Policy and/or Certification Practices
+      Statement to identify the CA for the purposes of this validation
+      method.
 
    Validation Data Reuse Period  The period during which a CA may rely
       on validation data, as defined by the CA's practices and
@@ -631,14 +631,6 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 11.1.  Normative References
 
-   [RFC1034]  Mockapetris, P., "Domain names - concepts and facilities",
-              STD 13, RFC 1034, DOI 10.17487/RFC1034, November 1987,
-              <https://www.rfc-editor.org/rfc/rfc1034>.
-
-   [RFC1035]  Mockapetris, P., "Domain names - implementation and
-              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
-              November 1987, <https://www.rfc-editor.org/rfc/rfc1035>.
-
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -670,7 +662,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
               and Management of Publicly-Trusted Certificates", 2024,
               <https://cabforum.org/baseline-requirements-documents/>.
 
-Appendix A.  Acknowledgments {:numbered="false"}
+Acknowledgments
 
    The author would like to acknowledge the CA/Browser Forum for
    developing the Baseline Requirements that motivated this
