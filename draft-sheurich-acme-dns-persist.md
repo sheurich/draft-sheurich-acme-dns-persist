@@ -83,7 +83,7 @@ Certification Authorities implementing this method MUST comply with this specifi
 
 {::boilerplate bcp14}
 
-**Authorization Domain Name**: The domain name formed by prepending the DNS TXT Record Persistent DCV Domain Label to the domain name being validated.
+Authorization Domain Name: The domain name at which the validation TXT record is provisioned. It is formed by prepending the label "_validation-persist" to the FQDN being validated.
 
 **DNS TXT Record Persistent DCV Domain Label**: The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
 
@@ -137,9 +137,7 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 - `policy=wildcard-allowed`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See "Wildcard Certificate Validation" and "Subdomain Certificate Validation" sections.
 
-CAs MUST parse the issue-value string by first separating semicolon-separated fields, then parsing each field as either a domain name (for the issuer-domain-name) or a key=value pair (for accounturi and policy parameters).
-
-If the `policy` parameter is absent, the validation MUST only apply to the specific FQDN for which the record is set. If the `policy` parameter is present but contains a value not defined in this specification (i.e., any value other than `specific-subdomains-only` or `wildcard-allowed`), CAs MUST ignore the entire policy parameter and treat the validation as applying only to the specific FQDN. CAs MUST ignore unknown parameter keys not defined in this specification.
+The RDATA of this TXT record MUST be a string conforming to the 'issue-value' ABNF syntax defined in Section 4 of [RFC8659]. If the policy parameter is absent, the validation MUST apply only to the specific FQDN. If the policy parameter is present, its value MUST be treated case-insensitively. If the value is anything other than specific-subdomains-only or wildcard-allowed, the CA MUST proceed as if the policy parameter were not present. CAs MUST ignore any unknown parameter keys.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
@@ -185,9 +183,9 @@ To determine which subdomains are permitted, the FQDN for which the persistent T
 
 If the `policy` parameter is absent, or if it is present but does not authorize subdomain validation (e.g., a future policy value for a different purpose), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.
 
-**Security Warning**: Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
+**Security Warning**: See [Subdomain Validation Risks](#subdomain-validation-risks) for important security implications of enabling subdomain validation.
 
-For example, validation of "dept.example.com" would authorize certificates for "server.dept.example.com" but not for "dept.example.org" due to the suffix rule. Without an appropriate policy parameter, validation would only authorize certificates for "dept.example.com" itself.
+For a persistent TXT record provisioned at "_validation-persist.dept.example.com" with a 'policy' of 'specific-subdomains-only', a CA may issue a certificate for "server.dept.example.com" (since "dept.example.com" is the suffix). However, this validation MUST NOT be used to issue a certificate for "dept.example2.com" or "example.com".
 
 # Security Considerations {#security-considerations}
 
@@ -218,6 +216,8 @@ CAs SHOULD implement robust account security measures, including:
 
 Clients SHOULD protect their ACME account keys with the same level of security as they would protect private keys for high-value certificates.
 
+The security of this method is fundamentally bound to the security of the ACME account's private key. An attacker who compromises this key can immediately use all existing 'dns-persist-01' authorizations associated with that account to issue certificates until the authorizations are revoked. This elevates the importance of secure key management for ACME clients above that required for transient challenge methods.
+
 ## Subdomain Validation Risks {#subdomain-validation-risks}
 
 The ability to issue certificates for subdomains of validated FQDNs creates significant security risks, particularly in environments with subdomain delegation or where subdomains may be controlled by different entities.
@@ -234,6 +234,8 @@ Organizations considering the use of subdomain validation MUST:
 - Implement monitoring for subdomain creation and changes
 - Consider limiting subdomain validation to specific, controlled scenarios
 - Provide clear governance policies for subdomain certificate authority
+
+**Security Warning**: Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
 
 ## Cross-CA Validation Reuse {#cross-ca-validation-reuse}
 
