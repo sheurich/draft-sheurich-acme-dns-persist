@@ -1,0 +1,103 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2025-06-19T00:07:29.338650+00:00",
+  "repo": "sheurich/draft-sheurich-acme-dns-persist",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOO4VY2c68Bvqk",
+      "title": "Should `dns-persist-01` mandate DNSSEC for validation records?",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/1",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The `draft-sheurich-acme-dns-persist.txt` currently states in Section 7.1, \"Persistent Record Risks,\" that clients \"SHOULD protect validation records through appropriate DNS security measures, including:... Implementing DNS security extensions (DNSSEC) where possible\".[1] This issue seeks to open a discussion on whether this \"SHOULD\" should be elevated to a \"MUST\" for the `dns-persist-01` challenge method.\n\n**Background:**\n\nThe `dns-persist-01` method is designed for persistent DNS TXT records for domain control validation, particularly for environments where traditional, ephemeral challenge methods are impractical.[1] The draft acknowledges the inherent risks of persistent records, noting that \"DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering\".[1]\n\n**Arguments for Mandating DNSSEC (\"MUST\"):**\n\n1.  **Enhanced Security and Integrity:** Persistent DNS records introduce a longer window of vulnerability. Mandating DNSSEC would provide cryptographic authentication of DNS data, significantly mitigating risks of spoofing and tampering, ensuring that the CA receives authentic validation information.\n2.  **Alignment with Best Practices for Persistent Identifiers:** Other drafts, such as `draft-sheth-identifiers-dns/` (\"Best Practices for Persistent References in DNS\"), explicitly mandate DNSSEC for persistent DNS references to ensure global consistency and spoofing resistance. Given that `dns-persist-01` deals with persistent records, aligning with this stronger security posture seems appropriate.\n3.  **Mitigation of Record Tampering:** The draft's own \"Security Considerations\" section (7.5) highlights \"Record Tampering and Integrity\" as a concern. Mandating DNSSEC directly addresses this vulnerability by providing a verifiable chain of trust for the DNS records.[1]\n\n**Arguments Against Mandating DNSSEC (keeping \"SHOULD\"):**\n\n1.  **Deployability and Adoption:** DNSSEC is not yet universally deployed across all domains and DNS providers. Mandating it could limit the applicability and adoption of `dns-persist-01` in certain environments, such as some IoT deployments or multi-tenant platforms, where DNSSEC implementation might be complex or unavailable.[1]\n2.  **Operational Burden:** Requiring DNSSEC could introduce additional operational complexity for domain owners and DNS providers, potentially hindering the ease of use that ACME aims to provide.\n\n**Question for the Working Group:**\n\nConsidering the security benefits of DNSSEC for persistent records versus the potential impact on deployability, should Section 7.1 of `draft-sheurich-acme-dns-persist.txt` be updated to mandate (i.e., change \"SHOULD\" to \"MUST\") the use of DNSSEC for `dns-persist-01` validation records?\n\nWe invite discussion on the trade-offs and implications of such a change for both security and widespread adoption.\n",
+      "createdAt": "2025-06-17T19:40:31Z",
+      "updatedAt": "2025-06-17T19:40:31Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 2,
+      "id": "I_kwDOO4VY2c68B0CU",
+      "title": "Discussion: Referencing draft-sheth-identifiers-dns in dns-persist-01",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/2",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "This issue seeks to discuss the appropriateness and method of referencing `draft-sheth-identifiers-dns` (\"Best Practices for Persistent References in DNS\") within the `draft-sheurich-acme-dns-persist.txt` document. Both documents deal with aspects of persistent DNS records, but their scope and current maturity levels differ.\n\n**Background:**\n\n* **`draft-sheurich-acme-dns-persist.txt` (dns-persist-01):** Defines a specific ACME challenge method for persistent DNS TXT record validation. It aims to align with CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation.\n* **`draft-sheth-identifiers-dns`:** Provides general best practices for establishing and maintaining persistent associations between a global DNS domain name and various use-case-specific references, with a strong emphasis on mandating DNSSEC for cryptographic verifiability.\n\n**Considerations for Referencing `draft-sheth-identifiers-dns`:**\n\n**Arguments for Incorporating/Referencing (e.g., Informatively):**\n\n1.  **Broader Context and Best Practices:** `draft-sheth-identifiers-dns` offers valuable insights into the general principles and best practices for persistent DNS records, which could provide useful context for implementers of `dns-persist-01`.\n2.  **Security Alignment:** Both drafts address the security of persistent DNS records. `draft-sheth-identifiers-dns`'s strong emphasis on DNSSEC for integrity aligns with the security goals of `dns-persist-01`, which acknowledges \"Record Tampering and Integrity\" as a risk (Section 7.5).\n\n**Arguments Against Normative Incorporation/Referencing at this Stage:**\n\n1.  **Maturity Level (Both are Internet-Drafts):** Both `draft-sheurich-acme-dns-persist.txt` and `draft-sheth-identifiers-dns` are Internet-Drafts. IETF policy generally states that it's inappropriate to use Internet-Drafts as stable reference material. Normatively referencing one draft from another is typically discouraged and can cause significant publication delays.\n2.  **Scope and Mandate Differences:** `draft-sheth-identifiers-dns` *mandates* DNSSEC for persistent references. In contrast, `dns-persist-01` currently *recommends* DNSSEC (\"SHOULD... where possible,\" Section 7.1). A normative reference would implicitly introduce a stronger DNSSEC requirement for `dns-persist-01`, which is a notable policy decision.\n3.  **Stability of Content:** As drafts, their content is subject to change, revision, or even abandonment. A normative reference would tie the stability of `dns-persist-01` to an evolving external document, potentially conflicting with IETF's requirements for stable, archivable normative references.\n\n**Proposed Question for the Working Group:**\n\nGiven the current status of both documents as Internet-Drafts, their differing scopes, and the IETF's referencing policies, should `draft-sheurich-acme-dns-persist.txt` include a reference to `draft-sheth-identifiers-dns`? If so, what type of reference (e.g., informative, with a note about its draft status) would be most appropriate, and what are the implications for the `dns-persist-01` specification, particularly regarding DNSSEC requirements?\n\nWe invite discussion on how best to acknowledge relevant external work while maintaining the stability and clarity of the `dns-persist-01` specification.",
+      "createdAt": "2025-06-17T19:48:44Z",
+      "updatedAt": "2025-06-17T19:48:44Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 3,
+      "id": "I_kwDOO4VY2c68LnPI",
+      "title": "Evaluate Policy String Clarity",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/3",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "**Evaluate Policy String Clarity for Persistent DNS Challenge Records**\n\nThe current policy values for persistent DNS challenge records are:  \n- `specific-subdomains-only`  \n- `wildcard-allowed`\n\nWe should assess whether these terms are clear and unambiguous for both technical and non-technical readers. Consider:\n\n- Are the terms self-explanatory?\n- Could shorter or more conventional wording improve clarity?\n- Are there established precedents in relevant standards or software?\n\nSuggestions for alternative wording and feedback on current terminology are welcome!",
+      "createdAt": "2025-06-18T14:41:48Z",
+      "updatedAt": "2025-06-18T14:41:48Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": []
+}
