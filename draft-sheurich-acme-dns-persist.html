@@ -7,7 +7,7 @@
 <title>Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation</title>
 <meta content="Shiloh Heurich" name="author">
 <meta content='
-       This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed to fulfill requirements specified in the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation. 
+       This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed with a strong focus on security and robustness, incorporating widely adopted industry best practices for persistent domain control validation. This design aims to make it suitable for Certification Authorities operating under various policy environments, including those that align with the CA/Browser Forum Baseline Requirements. 
     ' name="description">
 <meta content="xml2rfc 3.29.0" name="generator">
 <meta content="acme" name="keyword">
@@ -1051,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Heurich</td>
-<td class="center">Expires 12 December 2025</td>
+<td class="center">Expires 25 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,12 +1064,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-sheurich-acme-dns-persist-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-06-10" class="published">10 June 2025</time>
+<time datetime="2025-06-23" class="published">23 June 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-12-12">12 December 2025</time></dd>
+<dd class="expires"><time datetime="2025-12-25">25 December 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1082,7 +1082,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed to fulfill requirements specified in the CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed with a strong focus on security and robustness, incorporating widely adopted industry best practices for persistent domain control validation. This design aims to make it suitable for Certification Authorities operating under various policy environments, including those that align with the CA/Browser Forum Baseline Requirements.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1119,7 +1119,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 25 December 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1152,7 +1152,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
-                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-relationship-to-ca-browser-" class="internal xref">Relationship to CA/Browser Forum Requirements</a></p>
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-robustness-and-alignment-wi" class="internal xref">Robustness and Alignment with Industry Best Practices</a></p>
 </li>
             </ul>
 </li>
@@ -1201,6 +1201,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
                 <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-record-tampering-and-integr" class="internal xref">Record Tampering and Integrity</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-revocation-and-invalidation" class="internal xref">Revocation and Invalidation of Persistent Authorizations</a></p>
 </li>
             </ul>
 </li>
@@ -1287,27 +1290,27 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </ul>
 <p id="section-1-4">This document defines a new ACME challenge type, "dns-persist-01". This method proves control over a Fully Qualified Domain Name (FQDN) by confirming the presence of a persistent DNS TXT record containing CA and account identification information.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">The record format is based on the "issue-value" syntax from <span>[<a href="#RFC8659" class="cite xref">RFC8659</a>]</span>, incorporating an issuer-domain-name and a mandatory accounturi parameter <span>[<a href="#RFC8657" class="cite xref">RFC8657</a>]</span> that uniquely identifies the applicant's account. This design provides strong binding between the domain, the CA, and the specific account requesting validation.<a href="#section-1-5" class="pilcrow">¶</a></p>
-<div id="relationship-to-cabf">
+<div id="robustness-and-alignment">
 <section id="section-1.1">
-        <h3 id="name-relationship-to-ca-browser-">
-<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-relationship-to-ca-browser-" class="section-name selfRef">Relationship to CA/Browser Forum Requirements</a>
+        <h3 id="name-robustness-and-alignment-wi">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-robustness-and-alignment-wi" class="section-name selfRef">Robustness and Alignment with Industry Best Practices</a>
         </h3>
-<p id="section-1.1-1">This validation method is designed to align with industry practices for persistent DNS TXT record validation, such as those described in the CA/Browser Forum Baseline Requirements <span>[<a href="#CABF-BR" class="cite xref">CABF-BR</a>]</span>. The following key requirements are incorporated directly into this specification:<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-1">This validation method is designed to provide a robust and persistent mechanism for domain control verification within the ACME protocol. Its technical design incorporates widely adopted security principles and best practices for domain validation, ensuring high assurance regardless of the specific CA policy environment. These principles include, but are not limited to:<a href="#section-1.1-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-1.1-2">
 <li id="section-1.1-2.1">
-            <p id="section-1.1-2.1.1">Use of the "_validation-persist" DNS label as the Authorization Domain Name prefix<a href="#section-1.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-2.1.1">The use of a well-defined, unique DNS label (e.g., "_validation-persist") for persistent validation records, minimizing potential conflicts.<a href="#section-1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-1.1-2.2">
-            <p id="section-1.1-2.2.1">Multi-Perspective Validation requirements (see <a href="#multi-perspective-validation" class="auto internal xref">Section 4.1</a>)<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-2.2.1">Mandatory multi-perspective validation by the Certificate Authority, enhancing resilience against localized DNS attacks and ensuring global visibility of the record (see {#multi-perspective-validation}).<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-1.1-2.3">
-            <p id="section-1.1-2.3.1">Validation Data Reuse periods based on TTL values (see <a href="#validation-data-reuse-and-ttl" class="auto internal xref">Section 4.2</a>)<a href="#section-1.1-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-2.3.1">Consideration of DNS TTL values when determining the effective validity period of an authorization, balancing persistence with responsiveness to DNS changes (see <a href="#validation-data-reuse-and-ttl-handling" class="auto internal xref">Section 4.2</a>).<a href="#section-1.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-1.1-2.4">
-            <p id="section-1.1-2.4.1">Explicit account binding through the accounturi parameter<a href="#section-1.1-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-2.4.1">Explicit binding of the domain validation to a specific ACME account through a unique identifier, establishing clear accountability and enhancing security against unauthorized use.<a href="#section-1.1-2.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-1.1-3">Certification Authorities implementing this method MUST comply with this specification and MAY additionally need to comply with other applicable industry requirements depending on their trust program participation.<a href="#section-1.1-3" class="pilcrow">¶</a></p>
+<p id="section-1.1-3">Certification Authorities operating under various trust program requirements will find this technical framework suitable for their domain validation needs, as its design inherently supports robust and auditable validation practices (see <a href="#multi-perspective-validation" class="auto internal xref">Section 4.1</a>).<a href="#section-1.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1418,7 +1421,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <p id="section-4-5.2.1"><code>policy=wildcard-allowed</code>: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., <code>*.example.com</code>). See <a href="#wildcard-certificate-validation" class="auto internal xref">Section 5</a> and <a href="#subdomain-certificate-validation" class="auto internal xref">Section 6</a>.<a href="#section-4-5.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-4-6">The RDATA of this TXT record MUST be a string conforming to the 'issue-value' ABNF syntax defined in Section 4 of <span>[<a href="#RFC8659" class="cite xref">RFC8659</a>]</span>. If the <code>policy</code> parameter is absent, the validation MUST apply only to the specific FQDN. If the <code>policy</code> parameter is present, its value MUST be treated case-insensitively. If the value is anything other than <code>specific-subdomains-only</code> or <code>wildcard-allowed</code>, the CA MUST proceed as if the policy parameter were not present. CAs MUST ignore any unknown parameter keys.<a href="#section-4-6" class="pilcrow">¶</a></p>
+<p id="section-4-6">If the <code>policy</code> parameter is absent, or if its value is anything other than <code>specific-subdomains-only</code> or <code>wildcard-allowed</code>, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs MUST ignore any unknown parameter keys.<a href="#section-4-6" class="pilcrow">¶</a></p>
 <p id="section-4-7">For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:<a href="#section-4-7" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4-8">
 <pre>
@@ -1440,13 +1443,13 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <p id="section-4.1-1">CAs performing validations using the "dns-persist-01" method MUST implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective MUST observe the same challenge information as the Primary Network Perspective.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="validation-data-reuse-and-ttl">
+<div id="validation-data-reuse-and-ttl-handling">
 <section id="section-4.2">
         <h3 id="name-validation-data-reuse-and-t">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-validation-data-reuse-and-t" class="section-name selfRef">Validation Data Reuse and TTL Handling</a>
         </h3>
-<p id="section-4.2-1">This validation method is explicitly designed for persistence and reuse. If the DNS TXT record has a Time-to-Live (TTL) that is less than the CA's defined validation data reuse period, then the CA MUST consider the validation data reuse period to be equal to the TTL or 8 hours, whichever is greater.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described above.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its <code>Validation Data Reuse Period</code> (as defined in Section 2). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST adjust the effective validation data reuse period for that specific validation. In such cases, the effective validation data reuse period SHALL be the greater of: (a) the DNS TXT record's TTL, or (b) 8 hours.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described in this section.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1471,18 +1474,26 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
           <p id="section-6-2.1.1">The persistent DNS TXT record MUST include either <code>policy=specific-subdomains-only</code> or <code>policy=wildcard-allowed</code>.<a href="#section-6-2.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-6-3">To determine which subdomains are permitted, the FQDN for which the persistent TXT record exists (the "validated FQDN") must appear as the exact suffix of the FQDN for which a certificate is requested (the "requested FQDN"). For example, if <code>dept.example.com</code> is the validated FQDN, a certificate for <code>server.dept.example.com</code> is permitted because <code>dept.example.com</code> is its suffix. This subdomain validation differs from the wildcard policy primarily in scope:<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-3">To determine which subdomains are permitted, the FQDN for which the persistent TXT record exists (referred to as the "validated FQDN") must appear as the exact suffix of the FQDN for which a certificate is requested (referred to as the "requested FQDN"). For example, if <code>dept.example.com</code> is the validated FQDN, a certificate for <code>server.dept.example.com</code> is permitted because <code>dept.example.com</code> is its suffix.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">The key distinction between the <code>policy</code> values for subdomain authorization is as follows:<a href="#section-6-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-4.1">
-          <p id="section-6-4.1.1">With <code>policy=specific-subdomains-only</code> on the validated FQDN, certificates can be issued for the validated FQDN itself and its specific subdomains (per the suffix rule), but explicitly NOT for a wildcard covering those subdomains (e.g., <code>*.dept.example.com</code>).<a href="#section-6-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-6-5.1">
+          <p id="section-6-5.1.1"><strong><code>policy=specific-subdomains-only</code>:</strong> When this value is present, the validation authorizes certificates for the <em>validated FQDN itself</em> and for <em>any specific subdomain</em> of the validated FQDN (i.e., any <code>requested FQDN</code> where the <code>validated FQDN</code> is an exact suffix). <strong>Crucially, this policy explicitly DOES NOT authorize the issuance of wildcard certificates</strong> (e.g., <code>*.dept.example.com</code>). This is intended for domain owners who want to enable automated issuance for individual subdomains but maintain strict control over wildcard certificates.<a href="#section-6-5.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-6-4.2">
-          <p id="section-6-4.2.1">With <code>policy=wildcard-allowed</code> on the validated FQDN, certificates can be issued for the validated FQDN, its specific subdomains (per the suffix rule), AND for a wildcard covering those subdomains (e.g., <code>*.dept.example.com</code>). The "Wildcard Certificate Validation" section further details how <code>policy=wildcard-allowed</code> is typically used on a base domain to authorize certificates like <code>*.example.com</code>.<a href="#section-6-4.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-6-5.2">
+          <p id="section-6-5.2.1"><strong><code>policy=specific-subdomains-only</code>:</strong> When this value is present, the validation authorizes certificates for the <em>validated FQDN itself</em> and for <em>any specific subdomain</em> of the validated FQDN (i.e., any <code>requested FQDN</code> where the <code>validated FQDN</code> is an exact suffix). <em>Crucially, this policy explicitly DOES NOT authorize the issuance of wildcard certificates</em> (e.g., <code>*.dept.example.com</code>). This is intended for domain owners who want to enable automated issuance for individual subdomains but maintain strict control over wildcard certificates.<a href="#section-6-5.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-5.3">
+          <p id="section-6-5.3.1"><strong><code>policy=wildcard-allowed</code>:</strong> When this value is present, the validation authorizes certificates for the <em>validated FQDN itself</em>, for <em>any specific subdomain</em> of the validated FQDN (per the suffix rule), and <strong>additionally for wildcard certificates</strong> covering the validated FQDN (e.g., <code>*.example.com</code> if <code>example.com</code> is the validated FQDN). This policy grants the broadest scope of validation.<a href="#section-6-5.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-6-5">If the <code>policy</code> parameter is absent, or if it is present but does not authorize subdomain validation (e.g., a future policy value for a different purpose), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.<a href="#section-6-5" class="pilcrow">¶</a></p>
-<p id="section-6-6">See <a href="#subdomain-validation-risks" class="auto internal xref">Section 7.3</a> for important security implications of enabling subdomain validation.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7">For a persistent TXT record provisioned at "_validation-persist.dept.example.com" with a 'policy' of 'specific-subdomains-only', a CA may issue a certificate for "server.dept.example.com" (since "dept.example.com" is the suffix). However, this validation MUST NOT be used to issue a certificate for "dept.example2.com" or "example.com".<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-6">If the <code>policy</code> parameter is absent, or if it is present but its value does not explicitly authorize subdomain validation (e.g., an unrecognized or future policy value), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">See <a href="#subdomain-validation-risks" class="auto internal xref">Section 7.3</a> for important security implications of enabling subdomain validation.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-8"><em>Example: Scope of 'specific-subdomains-only' Policy</em><a href="#section-6-8" class="pilcrow">¶</a></p>
+<p id="section-6-9">For a persistent TXT record provisioned at <code>_validation-persist.dept.example.com</code> with a <code>policy</code> of <code>specific-subdomains-only</code>, a CA may issue a certificate for <code>server.dept.example.com</code> (since <code>dept.example.com</code> is its suffix). However, this validation MUST NOT be used to issue a certificate for <code>*.dept.example.com</code>, <code>dept.example2.com</code>, or <code>example.com</code>.<a href="#section-6-9" class="pilcrow">¶</a></p>
+<p id="section-6-10"><em>Example: Scope of 'wildcard-allowed' Policy</em><a href="#section-6-10" class="pilcrow">¶</a></p>
+<p id="section-6-11">For a persistent TXT record provisioned at <code>_validation-persist.example.com</code> with a <code>policy</code> of <code>wildcard-allowed</code>, a CA may issue certificates for <code>example.com</code>, <code>www.example.com</code>, <code>app.example.com</code>, and <code>*.example.com</code>."<a href="#section-6-11" class="pilcrow">¶</a></p>
+<p id="section-6-12"><strong>Rationale for <code>specific-subdomains-only</code>:</strong> Imagine a large organization (e.g., <code>university.edu</code>) that wants to allow departments to get certificates for their specific subdomains (e.g., <code>math.university.edu</code>, <code>cs.university.edu</code>, <code>biology.university.edu</code>). They want this automated. However, they might <em>not</em> want to grant the CA (or an ACME account) the power to issue <code>*.university.edu</code> unless explicitly handled through a much stricter, higher-level process. <code>specific-subdomains-only</code> provides this crucial intermediate level of control.<a href="#section-6-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security-considerations">
@@ -1592,6 +1603,37 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
         </h3>
 <p id="section-7.5-1">DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
 <p id="section-7.5-2">Additionally, CAs MUST protect their <code>issuer-domain-name</code> with robust security measures (such as DNSSEC). An attacker who compromises the DNS for a CA's <code>issuer-domain-name</code> could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="revocation-and-invalidation">
+<section id="section-7.6">
+        <h3 id="name-revocation-and-invalidation">
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-revocation-and-invalidation" class="section-name selfRef">Revocation and Invalidation of Persistent Authorizations</a>
+        </h3>
+<p id="section-7.6-1">The persistent nature of <code>dns-persist-01</code> authorizations means that a valid DNS TXT record can grant control for an extended period, potentially even if the domain owner's intent changes or if the associated ACME account key is compromised. Therefore, explicit mechanisms for revoking or invalidating these persistent authorizations are critical.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<p id="section-7.6-2">The primary method for an Applicant to invalidate a <code>dns-persist-01</code> authorization for a domain is to <strong>remove the corresponding DNS TXT record</strong> from the Authorization Domain Name. Once the record is removed, the CA, upon subsequent validation attempts or periodic re-checks, will no longer find the required information, and the authorization will cease to be valid after the expiration of its effective Validation Data Reuse Period.<a href="#section-7.6-2" class="pilcrow">¶</a></p>
+<p id="section-7.6-3">ACME Clients SHOULD provide clear mechanisms for users to:<a href="#section-7.6-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.6-4.1">
+            <p id="section-7.6-4.1.1">Remove the <code>_validation-persist</code> DNS TXT record.<a href="#section-7.6-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.6-4.2">
+            <p id="section-7.6-4.2.1">Monitor the presence and content of their <code>_validation-persist</code> records to ensure they accurately reflect desired authorization.<a href="#section-7.6-4.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.6-5">Certificate Authorities (CAs) implementing this method MUST:<a href="#section-7.6-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.6-6.1">
+            <p id="section-7.6-6.1.1">Periodically re-check active <code>dns-persist-01</code> authorizations to confirm the continued presence and validity of the DNS TXT record. The frequency of these re-checks SHOULD be at least as often as the effective Validation Data Reuse Period for that specific validation (as determined per <a href="#validation-data-reuse-and-ttl-handling" class="auto internal xref">Section 4.2</a>), and MUST occur no less frequently than every 8 hours to promptly detect and act upon record removal or modification.<a href="#section-7.6-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.6-6.2">
+            <p id="section-7.6-6.2.1">Invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect <code>issuer-domain-name</code>, missing <code>accounturi</code>, altered <code>policy</code>).<a href="#section-7.6-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.6-6.3">
+            <p id="section-7.6-6.3.1">Ensure their internal systems are capable of efficiently handling the invalidation of authorizations when DNS records are removed or become invalid.<a href="#section-7.6-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.6-7">While this method provides a persistent signal of control, the fundamental ACME authorization object (as defined in <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>) remains subject to its own lifecycle, including expiration. A persistent DNS record allows for repeated authorizations, but each authorization object issued by the CA will have a defined validity period, after which it expires unless renewed.<a href="#section-7.6-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
