@@ -1301,7 +1301,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-1.1-2.1.1">The use of a well-defined, unique DNS label (e.g., "_validation-persist") for persistent validation records, minimizing potential conflicts.<a href="#section-1.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-1.1-2.2">
-            <p id="section-1.1-2.2.1">Mandatory multi-perspective validation by the Certificate Authority, enhancing resilience against localized DNS attacks and ensuring global visibility of the record (see {#multi-perspective-validation}).<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-1.1-2.2.1">Mandatory multi-perspective validation by the Certificate Authority, enhancing resilience against localized DNS attacks and ensuring global visibility of the record (see <a href="#multi-perspective-validation" class="auto internal xref">Section 4.1</a>).<a href="#section-1.1-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-1.1-2.3">
             <p id="section-1.1-2.3.1">Consideration of DNS TTL values when determining the effective validity period of an authorization, balancing persistence with responsiveness to DNS changes (see <a href="#validation-data-reuse-and-ttl-handling" class="auto internal xref">Section 4.2</a>).<a href="#section-1.1-2.3.1" class="pilcrow">¶</a></p>
@@ -1448,7 +1448,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
         <h3 id="name-validation-data-reuse-and-t">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-validation-data-reuse-and-t" class="section-name selfRef">Validation Data Reuse and TTL Handling</a>
         </h3>
-<p id="section-4.2-1">This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its <code>Validation Data Reuse Period</code> (as defined in Section 2). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST adjust the effective validation data reuse period for that specific validation. In such cases, the effective validation data reuse period SHALL be the greater of: (a) the DNS TXT record's TTL, or (b) 8 hours.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its <code>Validation Data Reuse Period</code> (as defined in <a href="#conventions-and-definitions" class="auto internal xref">Section 2</a>). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST adjust the effective validation data reuse period for that specific validation. In such cases, the effective validation data reuse period SHALL be the greater of: (a) the DNS TXT record's TTL, or (b) 8 hours.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2">CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described in this section.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>

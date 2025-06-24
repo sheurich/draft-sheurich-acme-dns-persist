@@ -168,8 +168,7 @@ Table of Contents
 
    2.  Mandatory multi-perspective validation by the Certificate
        Authority, enhancing resilience against localized DNS attacks and
-       ensuring global visibility of the record (see {#multi-
-       perspective-validation}).
+       ensuring global visibility of the record (see Section 4.1).
 
    3.  Consideration of DNS TTL values when determining the effective
        validity period of an authorization, balancing persistence with
