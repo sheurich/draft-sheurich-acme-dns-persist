@@ -129,16 +129,16 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 4. The issue-value MAY contain a `policy` parameter. If present, this parameter modifies the validation scope. The `policy` parameter follows the `key=value` syntax. The policy parameter key and its defined values MUST be treated as case-insensitive. The following values for the `policy` parameter are defined with respect to subdomain and wildcard validation:
 
-- `policy=specific-subdomains-only`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN and for specific subdomains of the validated FQDN, as described in {{subdomain-certificate-validation}}. This policy value explicitly does NOT authorize wildcard certificates.
+- `policy=subdomains`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN and for specific subdomains of the validated FQDN, as described in {{subdomain-certificate-validation}}. This policy value explicitly does NOT authorize wildcard certificates.
 
-- `policy=wildcard-allowed`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
+- `policy=wildcard`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
 
-If the `policy` parameter is absent, or if its value is anything other than `specific-subdomains-only` or `wildcard-allowed`, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs MUST ignore any unknown parameter keys.
+If the `policy` parameter is absent, or if its value is anything other than `subdomains` or `wildcard`, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs MUST ignore any unknown parameter keys.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
 ~~~
-_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=specific-subdomains-only"
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=subdomains"
 ~~~
 
 If no policy parameter is included, the record defaults to FQDN-only validation:
@@ -161,38 +161,38 @@ CAs MAY reuse validation data obtained through this method for the duration of t
 
 # Wildcard Certificate Validation {#wildcard-certificate-validation}
 
-This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard-allowed` parameter value.
+This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard` parameter value.
 
-When such a record is present (i.e., containing `policy=wildcard-allowed`), it can validate the base domain, specific subdomains, and wildcard certificates for that domain. For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard-allowed` can validate certificates for `example.com`, `www.example.com`, and `*.example.com`. If the `policy` parameter is absent or set to `specific-subdomains-only`, the validation is not sufficient for `*.example.com`.
+When such a record is present (i.e., containing `policy=wildcard`), it can validate the base domain, specific subdomains, and wildcard certificates for that domain. For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard` can validate certificates for `example.com`, `www.example.com`, and `*.example.com`. If the `policy` parameter is absent or set to `subdomains`, the validation is not sufficient for `*.example.com`.
 
 # Subdomain Certificate Validation {#subdomain-certificate-validation}
 
 If an FQDN has been successfully validated using this method, the CA MAY also consider this validation sufficient for issuing certificates for other FQDNs that are subdomains of the validated FQDN, under the following conditions:
 
-* The persistent DNS TXT record MUST include either `policy=specific-subdomains-only` or `policy=wildcard-allowed`.
+* The persistent DNS TXT record MUST include either `policy=subdomains` or `policy=wildcard`.
 
 To determine which subdomains are permitted, the FQDN for which the persistent TXT record exists (referred to as the "validated FQDN") must appear as the exact suffix of the FQDN for which a certificate is requested (referred to as the "requested FQDN"). For example, if `dept.example.com` is the validated FQDN, a certificate for `server.dept.example.com` is permitted because `dept.example.com` is its suffix.
 
 The key distinction between the `policy` values for subdomain authorization is as follows:
 
-* **`policy=specific-subdomains-only`:** When this value is present, the validation authorizes certificates for the *validated FQDN itself* and for *any specific subdomain* of the validated FQDN (i.e., any `requested FQDN` where the `validated FQDN` is an exact suffix). **Crucially, this policy explicitly DOES NOT authorize the issuance of wildcard certificates** (e.g., `*.dept.example.com`). This is intended for domain owners who want to enable automated issuance for individual subdomains but maintain strict control over wildcard certificates.
-* **`policy=specific-subdomains-only`:** When this value is present, the validation authorizes certificates for the *validated FQDN itself* and for *any specific subdomain* of the validated FQDN (i.e., any `requested FQDN` where the `validated FQDN` is an exact suffix). _Crucially, this policy explicitly DOES NOT authorize the issuance of wildcard certificates_ (e.g., `*.dept.example.com`). This is intended for domain owners who want to enable automated issuance for individual subdomains but maintain strict control over wildcard certificates.
+* **`policy=subdomains`:** When this value is present, the validation authorizes certificates for the *validated FQDN itself* and for *any specific subdomain* of the validated FQDN (i.e., any `requested FQDN` where the `validated FQDN` is an exact suffix). **Crucially, this policy explicitly DOES NOT authorize the issuance of wildcard certificates** (e.g., `*.dept.example.com`). This is intended for domain owners who want to enable automated issuance for individual subdomains but maintain strict control over wildcard certificates.
+* **`policy=subdomains`:** When this value is present, the validation authorizes certificates for the *validated FQDN itself* and for *any specific subdomain* of the validated FQDN (i.e., any `requested FQDN` where the `validated FQDN` is an exact suffix). _Crucially, this policy explicitly DOES NOT authorize the issuance of wildcard certificates_ (e.g., `*.dept.example.com`). This is intended for domain owners who want to enable automated issuance for individual subdomains but maintain strict control over wildcard certificates.
 
-* **`policy=wildcard-allowed`:** When this value is present, the validation authorizes certificates for the *validated FQDN itself*, for *any specific subdomain* of the validated FQDN (per the suffix rule), and **additionally for wildcard certificates** covering the validated FQDN (e.g., `*.example.com` if `example.com` is the validated FQDN). This policy grants the broadest scope of validation.
+* **`policy=wildcard`:** When this value is present, the validation authorizes certificates for the *validated FQDN itself*, for *any specific subdomain* of the validated FQDN (per the suffix rule), and **additionally for wildcard certificates** covering the validated FQDN (e.g., `*.example.com` if `example.com` is the validated FQDN). This policy grants the broadest scope of validation.
 
 If the `policy` parameter is absent, or if it is present but its value does not explicitly authorize subdomain validation (e.g., an unrecognized or future policy value), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.
 
 See {{subdomain-validation-risks}} for important security implications of enabling subdomain validation.
 
-*Example: Scope of 'specific-subdomains-only' Policy*
+*Example: Scope of 'subdomains' Policy*
 
-For a persistent TXT record provisioned at `_validation-persist.dept.example.com` with a `policy` of `specific-subdomains-only`, a CA may issue a certificate for `server.dept.example.com` (since `dept.example.com` is its suffix). However, this validation MUST NOT be used to issue a certificate for `*.dept.example.com`, `dept.example2.com`, or `example.com`.
+For a persistent TXT record provisioned at `_validation-persist.dept.example.com` with a `policy` of `subdomains`, a CA may issue a certificate for `server.dept.example.com` (since `dept.example.com` is its suffix). However, this validation MUST NOT be used to issue a certificate for `*.dept.example.com`, `dept.example2.com`, or `example.com`.
 
-*Example: Scope of 'wildcard-allowed' Policy*
+*Example: Scope of 'wildcard' Policy*
 
-For a persistent TXT record provisioned at `_validation-persist.example.com` with a `policy` of `wildcard-allowed`, a CA may issue certificates for `example.com`, `www.example.com`, `app.example.com`, and `*.example.com`."
+For a persistent TXT record provisioned at `_validation-persist.example.com` with a `policy` of `wildcard`, a CA may issue certificates for `example.com`, `www.example.com`, `app.example.com`, and `*.example.com`."
 
-**Rationale for `specific-subdomains-only`:** Imagine a large organization (e.g., `university.edu`) that wants to allow departments to get certificates for their specific subdomains (e.g., `math.university.edu`, `cs.university.edu`, `biology.university.edu`). They want this automated. However, they might *not* want to grant the CA (or an ACME account) the power to issue `*.university.edu` unless explicitly handled through a much stricter, higher-level process. `specific-subdomains-only` provides this crucial intermediate level of control.
+**Rationale for `subdomains`:** Imagine a large organization (e.g., `university.edu`) that wants to allow departments to get certificates for their specific subdomains (e.g., `math.university.edu`, `cs.university.edu`, `biology.university.edu`). They want this automated. However, they might *not* want to grant the CA (or an ACME account) the power to issue `*.university.edu` unless explicitly handled through a much stricter, higher-level process. `subdomains` provides this crucial intermediate level of control.
 
 # Security Considerations {#security-considerations}
 
@@ -225,7 +225,7 @@ Clients SHOULD protect their ACME account keys with the same level of security a
 
 ## Subdomain Validation Risks {#subdomain-validation-risks}
 
-Enabling subdomain validation via `policy=specific-subdomains-only` or `policy=wildcard-allowed` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
+Enabling subdomain validation via `policy=subdomains` or `policy=wildcard` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. These policy values serve as the explicit mechanism for domain owners to opt-in to broader validation scopes.
 
 The ability to issue certificates for subdomains of validated FQDNs creates significant security risks, particularly in environments with subdomain delegation or where subdomains may be controlled by different entities.
 
@@ -347,10 +347,10 @@ For validation of "example.com" and its specific subdomains (e.g., "www.example.
 
 1. Same challenge object format as above.
 
-2. Client provisions DNS TXT record including `policy=specific-subdomains-only`:
+2. Client provisions DNS TXT record including `policy=subdomains`:
 
 ~~~
-_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=specific-subdomains-only"
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=subdomains"
 ~~~
 
 3. CA validates the record. This validation authorizes certificates for "example.com" and specific subdomains like "www.example.com", but not for "*.example.com".
@@ -361,10 +361,10 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 
 1. Same challenge object format as above.
 
-2. Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard-allowed`:
+2. Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard`:
 
 ~~~
-_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard-allowed"
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard"
 ~~~
 
 3. CA validates the record through multi-perspective DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
