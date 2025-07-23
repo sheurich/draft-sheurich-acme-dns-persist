@@ -384,16 +384,6 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
       for individual subdomains but maintain strict control over
       wildcard certificates.
 
-   *  *policy=subdomains:* When this value is present, the validation
-      authorizes certificates for the _validated FQDN itself_ and for
-      _any specific subdomain_ of the validated FQDN (i.e., any
-      requested FQDN where the validated FQDN is an exact suffix).
-      _Crucially, this policy explicitly DOES NOT authorize the issuance
-      of wildcard certificates_ (e.g., *.dept.example.com).  This is
-      intended for domain owners who want to enable automated issuance
-      for individual subdomains but maintain strict control over
-      wildcard certificates.
-
    *  *policy=wildcard:* When this value is present, the validation
       authorizes certificates for the _validated FQDN itself_, for _any
       specific subdomain_ of the validated FQDN (per the suffix rule),
