@@ -29,6 +29,10 @@ author:
    fullname: "Shiloh Heurich"
    organization: Fastly
    email: "sheurich@fastly.com"
+ -
+   fullname: "Henry Birge-Lee"
+   organization: "Princeton University"
+   email: "birgelee@princeton.edu"
 
 informative:
   CABF-BR:
