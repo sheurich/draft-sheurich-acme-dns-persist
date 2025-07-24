@@ -4,8 +4,9 @@
 
 Automated Certificate Management Environment                  S. Heurich
 Internet-Draft                                                    Fastly
-Intended status: Standards Track                            23 June 2025
-Expires: 25 December 2025
+Intended status: Standards Track                            H. Birge-Lee
+Expires: 25 December 2025                           Princeton University
+                                                            23 June 2025
 
 
    Automated Certificate Management Environment (ACME) Challenge for
@@ -112,7 +113,7 @@ Table of Contents
      11.1.  Normative References
      11.2.  Informative References
    Acknowledgments
-   Author's Address
+   Authors' Addresses
 
 1.  Introduction
 
@@ -758,8 +759,13 @@ Acknowledgments
    Thanks to the contributors and reviewers who provided feedback on
    early versions of this document.
 
-Author's Address
+Authors' Addresses
 
    Shiloh Heurich
    Fastly
    Email: sheurich@fastly.com
+
+
+   Henry Birge-Lee
+   Princeton University
+   Email: birgelee@princeton.edu
