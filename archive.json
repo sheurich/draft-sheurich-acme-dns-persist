@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-22T00:07:59.839772+00:00",
+  "timestamp": "2025-07-24T00:07:56.565400+00:00",
   "repo": "sheurich/draft-sheurich-acme-dns-persist",
   "labels": [
     {
@@ -87,17 +87,126 @@
       "id": "I_kwDOO4VY2c68LnPI",
       "title": "Evaluate Policy String Clarity",
       "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "sheurich",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "**Evaluate Policy String Clarity for Persistent DNS Challenge Records**\n\nThe current policy values for persistent DNS challenge records are:  \n- `specific-subdomains-only`  \n- `wildcard-allowed`\n\nWe should assess whether these terms are clear and unambiguous for both technical and non-technical readers. Consider:\n\n- Are the terms self-explanatory?\n- Could shorter or more conventional wording improve clarity?\n- Are there established precedents in relevant standards or software?\n\nSuggestions for alternative wording and feedback on current terminology are welcome!",
       "createdAt": "2025-06-18T14:41:48Z",
-      "updatedAt": "2025-06-18T14:41:48Z",
+      "updatedAt": "2025-07-23T13:48:35Z",
+      "closedAt": "2025-07-23T13:48:35Z",
+      "comments": [
+        {
+          "author": "sheurich",
+          "authorAssociation": "OWNER",
+          "body": "After careful review and consideration of existing standards, I propose changing the policy values to improve clarity, conciseness, and alignment with precedent.\n\n**Analysis of Current Terms:**\n\n*   `specific-subdomains-only`: This term, while descriptive, is overly verbose for a technical parameter. It's cumbersome to read and prone to typos.\n*   `wildcard-allowed`: This is clearer, but the `-allowed` suffix is redundant. The presence of the policy value itself implies permission.\n\n**Precedent in IETF Standards:**\n\nThe most relevant precedent is **RFC 8659 (CAA)**, which uses short, effective tags to define certificate issuance policy in DNS:\n*   `issue` (for specific FQDNs)\n*   `issuewild` (for wildcard domains)\n\nThis establishes a clear pattern of using concise, single-word tags for policy expression.\n\n**Proposal:**\n\nI recommend aligning with this precedent by adopting simpler, more direct terms for the `policy` parameter values:\n\n1.  Change `specific-subdomains-only` to **`subdomains`**.\n2.  Change `wildcard-allowed` to **`wildcard`**.\n\n**Justification:**\n\n*   **Clarity & Conciseness:** The new terms are direct and unambiguous. `wildcard` is a standard term of art, and `subdomains` is an intuitive descriptor for the intermediate scope.\n*   **Alignment with Precedent:** Using `wildcard` directly mirrors the concept of `issuewild` from CAA, making the specification more consistent with the existing DNS security ecosystem.\n*   **Improved Readability:** The resulting DNS TXT record is much cleaner.\n    *   **Before:** `... policy=specific-subdomains-only`\n    *   **After:** `... policy=subdomains`\n*   **Logical Hierarchy:** This creates a clear and progressive authorization scope:\n    *   **No `policy` value:** FQDN only (base case)\n    *   `policy=subdomains`: FQDN + specific subdomains\n    *   `policy=wildcard`: FQDN + subdomains + wildcard (highest privilege)\n\nThis change would make the `dns-persist-01` method easier to implement correctly and more intuitive for operators to use.",
+          "createdAt": "2025-07-23T13:42:19Z",
+          "updatedAt": "2025-07-23T13:42:19Z"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOO4VY2c7CHbP-",
+      "title": "Clarify handling of ambiguous/edge cases",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/5",
+      "state": "CLOSED",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft should provide clearer guidance on several edge cases to ensure consistent implementation:\n\n- **Multiple TXT Records:** Specify how a CA should behave if multiple TXT records are found at the same Authorization Domain Name. The recommended behavior is to succeed if at least one record is valid.\n- **Malformed  Parameter:** Define the expected behavior if the  parameter is syntactically incorrect (e.g., ). Should the record be ignored, or should the entire validation fail?\n- **Interaction with CAA:** Add a non-normative note to clarify that this validation method does not bypass standard CAA checking requirements (RFC 8659).",
+      "createdAt": "2025-07-23T15:00:26Z",
+      "updatedAt": "2025-07-23T15:23:26Z",
+      "closedAt": "2025-07-23T15:23:26Z",
+      "comments": [
+        {
+          "author": "sheurich",
+          "authorAssociation": "OWNER",
+          "body": "Duplicate",
+          "createdAt": "2025-07-23T15:23:26Z",
+          "updatedAt": "2025-07-23T15:23:26Z"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "I_kwDOO4VY2c7CHbz3",
+      "title": "Clarify handling of ambiguous/edge cases",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/6",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft should provide clearer guidance on several edge cases to ensure consistent implementation:\n\n- **Multiple TXT Records:** Specify how a CA should behave if multiple TXT records are found at the same Authorization Domain Name. The recommended behavior is to succeed if at least one record is valid.\n- **Malformed `policy` Parameter:** Define the expected behavior if the `policy` parameter is syntactically incorrect (e.g., `policy=subdomains;wildcard`). Should the record be ignored, or should the entire validation fail?\n- **Interaction with CAA:** Add a non-normative note to clarify that this validation method does not bypass standard CAA checking requirements (RFC 8659).",
+      "createdAt": "2025-07-23T15:01:06Z",
+      "updatedAt": "2025-07-23T15:01:06Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 7,
+      "id": "I_kwDOO4VY2c7CHcmI",
+      "title": "Enhance Security Considerations",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/7",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The Security Considerations section could be enhanced with more specific guidance:\n\n- **Account Key Rotation:** Add a note clarifying the operational procedure for key rotation. Specifically, state that the `accounturi` is a stable identifier and does not need to be changed in DNS when the client rotates their account key with the CA.\n- **Certificate Transparency Log Monitoring:** Mention that CT logs can reveal the use of this persistent validation method, making those domains higher-value targets and reinforcing the need for diligent DNS monitoring.",
+      "createdAt": "2025-07-23T15:02:10Z",
+      "updatedAt": "2025-07-23T15:02:10Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 8,
+      "id": "I_kwDOO4VY2c7CHc1W",
+      "title": "Provide more explicit implementation guidance",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/8",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "The draft could provide more explicit guidance for implementers:\n\n- **Guidance on Choosing TTLs:** Add a non-normative note to the \"Client Implementation Guidelines\" suggesting a reasonable range for TTL values (e.g., 1 to 24 hours) to balance persistence with timely revocation.\n- **Error Reporting:** Suggest specific ACME error types (from RFC 8555) for common validation failures, such as `urn:ietf:params:acme:error:unauthorized` for a mismatched `accounturi` or `urn:ietf:params:acme:error:malformed` for an unparsable TXT record. This will help client developers provide better debugging feedback to users.",
+      "createdAt": "2025-07-23T15:02:29Z",
+      "updatedAt": "2025-07-23T15:02:29Z",
       "closedAt": null,
       "comments": []
     }
   ],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 4,
+      "id": "PR_kwDOO4VY2c6gRgmk",
+      "title": "docs: Use clearer and more concise policy terminology",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/pull/4",
+      "state": "MERGED",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Fixes #3",
+      "createdAt": "2025-07-23T13:45:56Z",
+      "updatedAt": "2025-07-23T13:48:35Z",
+      "baseRepository": "sheurich/draft-sheurich-acme-dns-persist",
+      "baseRefName": "main",
+      "baseRefOid": "b8cefdb30edca1f60d612856f90a18a6e5088ecf",
+      "headRepository": "sheurich/draft-sheurich-acme-dns-persist",
+      "headRefName": "issue-3-policy-terms",
+      "headRefOid": "55e7ff490b17d5d09d35719e85a9e2308ac7f6d7",
+      "closedAt": "2025-07-23T13:48:34Z",
+      "mergedAt": "2025-07-23T13:48:34Z",
+      "mergedBy": "sheurich",
+      "mergeCommit": {
+        "oid": "848dead26afb7bd31baad693aea876e831cd66f4"
+      },
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
