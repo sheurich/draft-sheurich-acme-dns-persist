@@ -6,6 +6,7 @@
 <meta content="initial-scale=1.0" name="viewport">
 <title>Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation</title>
 <meta content="Shiloh Heurich" name="author">
+<meta content="Henry Birge-Lee" name="author">
 <meta content='
        This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed with a strong focus on security and robustness, incorporating widely adopted industry best practices for persistent domain control validation. This design aims to make it suitable for Certification Authorities operating under various policy environments, including those that align with the CA/Browser Forum Baseline Requirements. 
     ' name="description">
@@ -1050,7 +1051,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Heurich</td>
+<td class="left">Heurich &amp; Birge-Lee</td>
 <td class="center">Expires 25 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
@@ -1070,11 +1071,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
 <dd class="expires"><time datetime="2025-12-25">25 December 2025</time></dd>
-<dt class="label-authors">Author:</dt>
+<dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
       <div class="author-name">S. Heurich</div>
 <div class="org">Fastly</div>
+</div>
+<div class="author">
+      <div class="author-name">H. Birge-Lee</div>
+<div class="org">Princeton University</div>
 </div>
 </dd>
 </dl>
@@ -1267,7 +1272,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1997,8 +2002,8 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 </div>
 <div id="authors-addresses">
 <section id="appendix-B">
-      <h2 id="name-authors-address">
-<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      <h2 id="name-authors-addresses">
+<a href="#name-authors-addresses" class="section-name selfRef">Authors' Addresses</a>
       </h2>
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Shiloh Heurich</span></div>
@@ -2006,6 +2011,14 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <div class="email">
 <span>Email:</span>
 <a href="mailto:sheurich@fastly.com" class="email">sheurich@fastly.com</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Henry Birge-Lee</span></div>
+<div dir="auto" class="left"><span class="org">Princeton University</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:birgelee@princeton.edu" class="email">birgelee@princeton.edu</a>
 </div>
 </address>
 </section>
