@@ -264,7 +264,11 @@ Additionally, CAs MUST protect their `issuer-domain-name` with robust security m
 
 The `persistUntil` parameter provides domain owners with direct control over the validity period of their validation records. CAs and clients should be aware of the following considerations:
 
-- Domain owners should set reasonable expiration dates that balance security needs with operational convenience.
+- Domain owners should set expiration dates for validation records that balance security and operational needs. To avoid unexpected validation failures during certificate renewal, domain owners are advised to:
+  - Align `persistUntil` values with certificate lifetimes or planned maintenance intervals
+  - Monitor or set reminders for `persistUntil` expirations
+  - Document `persistUntil` practices in certificate management procedures
+  - Automate updates to validation records with new `persistUntil` values during certificate renewal workflows
 - CAs MUST properly parse and interpret the UNIX timestamp value as a base-10 integer and apply the expiration correctly.
 - CAs MUST reject or consider expired any validation record where the current time exceeds the `persistUntil` timestamp.
 
