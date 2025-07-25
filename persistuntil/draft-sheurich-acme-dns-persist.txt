@@ -352,11 +352,14 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
    CAs MAY reuse validation data obtained through this method for the
    duration of their validation data reuse period, subject to the TTL
-   constraints described in this section.  However, if a persistUntil
-   parameter is present in the DNS TXT record, the CA MUST NOT reuse the
-   validation data after the date and time specified in that parameter,
-   even if the CA's validation data reuse period would otherwise allow
-   it.
+   constraints described in this section.  The persistUntil parameter
+   indicates when the DNS validation record should no longer be
+   considered valid for new validation attempts.  If a persistUntil
+   parameter is present in the DNS TXT record, the CA MUST NOT
+   successfully complete a validation attempt after the date and time
+   specified in that parameter.  However, the persistUntil parameter
+   does not affect the CA's ability to reuse already-validated data
+   within their standard validation data reuse period.
 
 5.  Wildcard Certificate Validation
 
@@ -566,8 +569,21 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
    over the validity period of their validation records.  CAs and
    clients should be aware of the following considerations:
 
-   *  Domain owners should set reasonable expiration dates that balance
-      security needs with operational convenience.
+   *  Domain owners should set expiration dates for validation records
+      that balance security and operational needs.  To avoid unexpected
+      validation failures during certificate renewal, domain owners are
+      advised to:
+
+      -  Align persistUntil values with certificate lifetimes or planned
+         maintenance intervals
+
+      -  Monitor or set reminders for persistUntil expirations
+
+      -  Document persistUntil practices in certificate management
+         procedures
+
+      -  Automate updates to validation records with new persistUntil
+         values during certificate renewal workflows
 
    *  CAs MUST properly parse and interpret the UNIX timestamp value as
       a base-10 integer and apply the expiration correctly.
