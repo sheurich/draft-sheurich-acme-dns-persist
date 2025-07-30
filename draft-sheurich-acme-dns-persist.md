@@ -78,11 +78,10 @@ The record format is based on the "issue-value" syntax from {{!RFC8659}}, incorp
 This validation method is designed to provide a robust and persistent mechanism for domain control verification within the ACME protocol. Its technical design incorporates widely adopted security principles and best practices for domain validation, ensuring high assurance regardless of the specific CA policy environment. These principles include, but are not limited to:
 
 1. The use of a well-defined, unique DNS label (e.g., "_validation-persist") for persistent validation records, minimizing potential conflicts.
-2. Mandatory multi-perspective validation by the Certificate Authority, enhancing resilience against localized DNS attacks and ensuring global visibility of the record (see {{multi-perspective-validation}}).
-3. Consideration of DNS TTL values when determining the effective validity period of an authorization, balancing persistence with responsiveness to DNS changes (see {{validation-data-reuse-and-ttl-handling}}).
-4. Explicit binding of the domain validation to a specific ACME account through a unique identifier, establishing clear accountability and enhancing security against unauthorized use.
+2. Consideration of DNS TTL values when determining the effective validity period of an authorization, balancing persistence with responsiveness to DNS changes (see {{validation-data-reuse-and-ttl-handling}}).
+3. Explicit binding of the domain validation to a specific ACME account through a unique identifier, establishing clear accountability and enhancing security against unauthorized use.
 
-Certification Authorities operating under various trust program requirements will find this technical framework suitable for their domain validation needs, as its design inherently supports robust and auditable validation practices (see {{multi-perspective-validation}}).
+Certification Authorities operating under various trust program requirements will find this technical framework suitable for their domain validation needs, as its design inherently supports robust and auditable validation practices.
 
 # Conventions and Definitions {#conventions-and-definitions}
 
@@ -166,10 +165,6 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 ~~~
 
 The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account. The server also interprets any `policy` parameter values according to this specification.
-
-## Multi-Perspective Validation {#multi-perspective-validation}
-
-CAs performing validations using the "dns-persist-01" method MUST implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective MUST observe the same challenge information as the Primary Network Perspective.
 
 ## Validation Data Reuse and TTL Handling {#validation-data-reuse-and-ttl-handling}
 
@@ -323,7 +318,6 @@ IANA is requested to register the following entry in the "ACME Validation Method
 Certificate Authorities implementing this validation method should consider:
 
 - Establishing clear policies for Issuer Domain Name disclosure in Certificate Policies and Certification Practice Statements
-- Implementing robust multi-perspective validation infrastructure
 - Developing procedures for handling validation record TTL variations
 - Creating account security monitoring and incident response procedures
 - Providing clear documentation for clients on proper record construction
@@ -370,7 +364,7 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
-3. CA validates the record through multi-perspective DNS queries. This validation is sufficient only for "example.com".
+3. CA validates the record through DNS queries. This validation is sufficient only for "example.com".
 
 ## Specific Subdomain Validation Example {#specific-subdomain-validation-example}
 
@@ -398,7 +392,7 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard"
 ~~~
 
-3. CA validates the record through multi-perspective DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
+3. CA validates the record through DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
 
 ## Validation Example with persistUntil
 
