@@ -264,6 +264,18 @@ DNS records are generally not authenticated end-to-end, making them potentially 
 
 Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures (such as DNSSEC). An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
 
+## DNS Security Measures {#dns-security-measures}
+
+To enhance the security and integrity of the validation process, CAs and clients should consider implementing advanced DNS security measures.
+
+### DNSSEC
+
+DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data, ensuring that the validation records retrieved by the CA are authentic and have not been tampered with in transit. While this specification does not mandate DNSSEC, its use is strongly recommended to protect against DNS spoofing and cache poisoning attacks. CAs may choose to place greater trust in validations for domains that are DNSSEC-signed.
+
+### Multi-Perspective Validation
+
+Multi-Perspective Issuance Corroboration (MPIC) is a critical defense against localized network attacks, such as BGP hijacking and DNS spoofing. By validating from multiple geographic and network vantage points, a CA can ensure that the DNS validation record is globally visible and not just present on a compromised local network. While this specification does not mandate MPIC as a normative requirement for all implementations, CAs operating in high-security environments or under trust programs that require it (such as the CA/Browser Forum Baseline Requirements) should implement MPIC to ensure robust validation. This practice significantly mitigates the risk of mis-issuance due to targeted network attacks.
+
 ## persistUntil Parameter Considerations
 
 The `persistUntil` parameter provides domain owners with direct control over the validity period of their validation records. CAs and clients should be aware of the following considerations:
