@@ -149,7 +149,7 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 If the `policy` parameter is absent, or if its value is anything other than `subdomains` or `wildcard`, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs MUST ignore any unknown parameter keys.
 
-5. The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.16 of {{!POSIX.1}}. CAs MUST NOT consider this validation record valid after the specified timestamp, regardless of their validation data reuse period.
+5. The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.16 of {{!POSIX.1}}. CAs MUST NOT consider this validation record valid for new validation attempts after the specified timestamp, regardless of their validation data reuse period. However, this does not affect the reuse of already-validated data.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
