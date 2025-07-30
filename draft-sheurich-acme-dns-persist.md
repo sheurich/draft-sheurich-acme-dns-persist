@@ -41,6 +41,13 @@ informative:
       org: "CA/Browser Forum"
     date: 2024
     target: "https://cabforum.org/baseline-requirements-documents/"
+  POSIX.1:
+    title: "IEEE Standard for Information Technology--Portable Operating System Interface (POSIX(R)) Base Specifications, Issue 7"
+    author:
+      org: "IEEE"
+    date: 2018
+    seriesinfo: "IEEE Std 1003.1-2017"
+    target: "https://pubs.opengroup.org/onlinepubs/9699919799/"
 
 --- abstract
 
@@ -92,7 +99,7 @@ Validation Data Reuse Period
 : The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
 persistUntil
-: An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value MUST be a base-10 encoded integer representing a timestamp, formatted as a `NumericDate` value as defined in Section 2 of {{!RFC7519}}.
+: An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.16 of {{!POSIX.1}}.
 
 # The "dns-persist-01" Challenge {#dns-persist-01-challenge}
 
@@ -142,7 +149,7 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 If the `policy` parameter is absent, or if its value is anything other than `subdomains` or `wildcard`, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs MUST ignore any unknown parameter keys.
 
-5. The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing a timestamp, formatted as a `NumericDate` value as defined in Section 2 of {{!RFC7519}}. CAs MUST NOT consider this validation record valid after the specified timestamp, regardless of their validation data reuse period.
+5. The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.16 of {{!POSIX.1}}. CAs MUST NOT consider this validation record valid after the specified timestamp, regardless of their validation data reuse period.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", and wants to allow only specific subdomains, it might provision:
 
@@ -269,7 +276,7 @@ The `persistUntil` parameter provides domain owners with direct control over the
   - Monitor or set reminders for `persistUntil` expirations
   - Document `persistUntil` practices in certificate management procedures
   - Automate updates to validation records with new `persistUntil` values during certificate renewal workflows
-- CAs MUST properly parse and interpret the UNIX timestamp value as a base-10 integer and apply the expiration correctly.
+- CAs MUST properly parse and interpret the integer timestamp value as seconds since the epoch (see {{!POSIX.1}}) and apply the expiration correctly.
 - CAs MUST reject or consider expired any validation record where the current time exceeds the `persistUntil` timestamp.
 
 ## Revocation and Invalidation of Persistent Authorizations {#revocation-and-invalidation}
