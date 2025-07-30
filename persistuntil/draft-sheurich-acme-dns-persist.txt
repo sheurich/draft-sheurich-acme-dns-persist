@@ -309,8 +309,9 @@ Table of Contents
        present, the value MUST be a base-10 encoded integer representing
        the number of seconds since the epoch, as defined in Section 4.16
        of [POSIX.1].  CAs MUST NOT consider this validation record valid
-       after the specified timestamp, regardless of their validation
-       data reuse period.
+       for new validation attempts after the specified timestamp,
+       regardless of their validation data reuse period.  However, this
+       does not affect the reuse of already-validated data.
 
    For example, if the ACME client is requesting validation for the FQDN
    "example.com" from a CA that uses "authority.example" as its Issuer
