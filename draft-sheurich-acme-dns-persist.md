@@ -276,7 +276,7 @@ The `persistUntil` parameter provides domain owners with direct control over the
   - Monitor or set reminders for `persistUntil` expirations
   - Document `persistUntil` practices in certificate management procedures
   - Automate updates to validation records with new `persistUntil` values during certificate renewal workflows
-- CAs MUST properly parse and interpret the integer timestamp value as seconds since the epoch (see {{!POSIX.1}}) and apply the expiration correctly.
+- CAs MUST properly parse and interpret the integer timestamp value as seconds since the epoch (see Section 4.16 of {{!POSIX.1}}) and apply the expiration correctly.
 - CAs MUST reject or consider expired any validation record where the current time exceeds the `persistUntil` timestamp.
 
 ## Revocation and Invalidation of Persistent Authorizations {#revocation-and-invalidation}
