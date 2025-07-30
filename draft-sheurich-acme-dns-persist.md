@@ -41,13 +41,15 @@ informative:
       org: "CA/Browser Forum"
     date: 2024
     target: "https://cabforum.org/baseline-requirements-documents/"
-  POSIX.1:
-    title: "IEEE Standard for Information Technology--Portable Operating System Interface (POSIX(R)) Base Specifications, Issue 7"
+
+normative:
+  POSIX.1-2024:
+    title: "IEEE Standard for Information Technology\u2013Portable Operating System Interface (POSIX(R)) Base Specifications, Issue 8"
     author:
-      org: "IEEE"
-    date: 2018
-    seriesinfo: "IEEE Std 1003.1-2017"
-    target: "https://pubs.opengroup.org/onlinepubs/9699919799/"
+      org: "IEEE and The Open Group"
+    date: 2024
+    seriesinfo: "IEEE Std 1003.1\u2122-2024 / The Open Group Base Specifications Issue 8"
+    target: "https://pubs.opengroup.org/onlinepubs/9699919904/"
 
 --- abstract
 
