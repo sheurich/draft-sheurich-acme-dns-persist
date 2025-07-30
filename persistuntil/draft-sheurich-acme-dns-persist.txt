@@ -587,8 +587,8 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
          values during certificate renewal workflows
 
    *  CAs MUST properly parse and interpret the integer timestamp value
-      as seconds since the epoch (see [POSIX.1]) and apply the
-      expiration correctly.
+      as seconds since the epoch (see Section 4.16 of [POSIX.1]) and
+      apply the expiration correctly.
 
    *  CAs MUST reject or consider expired any validation record where
       the current time exceeds the persistUntil timestamp.
