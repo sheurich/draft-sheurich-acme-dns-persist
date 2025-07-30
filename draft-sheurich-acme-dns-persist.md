@@ -301,11 +301,11 @@ ACME Clients SHOULD provide clear mechanisms for users to:
 
 Certificate Authorities (CAs) implementing this method MUST:
 
-* Periodically re-check active `dns-persist-01` authorizations to confirm the continued presence and validity of the DNS TXT record. The frequency of these re-checks SHOULD be at least as often as the effective Validation Data Reuse Period for that specific validation (as determined per {{validation-data-reuse-and-ttl-handling}}), and MUST occur no less frequently than every 8 hours to promptly detect and act upon record removal or modification.
+* Periodically re-check active `dns-persist-01` authorizations to confirm the continued presence and validity of the DNS TXT record. To limit the window of opportunity for misuse after a record is removed, it is RECOMMENDED that these re-checks occur at intervals of a few hours.
 
 * Invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
 
-* CAs MUST also invalidate authorizations when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise be valid.
+* Invalidate authorizations when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise be valid.
 
 * Ensure their internal systems are capable of efficiently handling the invalidation of authorizations when DNS records are removed or become invalid.
 
