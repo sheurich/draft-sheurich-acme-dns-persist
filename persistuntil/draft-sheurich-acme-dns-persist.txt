@@ -216,7 +216,7 @@ Table of Contents
       specifies the timestamp after which the validation record should
       no longer be considered valid by CAs.  The value MUST be a base-10
       encoded integer representing the number of seconds since the
-      epoch, as defined in Section 4.16 of [POSIX.1].
+      epoch, as defined in Section 4.19 of [POSIX].
 
 3.  The "dns-persist-01" Challenge
 
@@ -307,11 +307,11 @@ Table of Contents
 
    1.  The issue-value MAY contain a persistUntil parameter.  If
        present, the value MUST be a base-10 encoded integer representing
-       the number of seconds since the epoch, as defined in Section 4.16
-       of [POSIX.1].  CAs MUST NOT consider this validation record valid
-       for new validation attempts after the specified timestamp,
-       regardless of their validation data reuse period.  However, this
-       does not affect the reuse of already-validated data.
+       the number of seconds since the epoch, as defined in Section 4.19
+       of [POSIX].  CAs MUST NOT consider this validation record valid
+       for new validation attempts after the specified timestamp.
+       However, this does not affect the reuse of already-validated
+       data.
 
    For example, if the ACME client is requesting validation for the FQDN
    "example.com" from a CA that uses "authority.example" as its Issuer
@@ -358,9 +358,8 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
    considered valid for new validation attempts.  If a persistUntil
    parameter is present in the DNS TXT record, the CA MUST NOT
    successfully complete a validation attempt after the date and time
-   specified in that parameter.  However, the persistUntil parameter
-   does not affect the CA's ability to reuse already-validated data
-   within their standard validation data reuse period.
+   specified in that parameter.  This restriction does not preclude
+   reuse of data that has already been validated.
 
 5.  Wildcard Certificate Validation
 
@@ -587,8 +586,8 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
          values during certificate renewal workflows
 
    *  CAs MUST properly parse and interpret the integer timestamp value
-      as seconds since the epoch (see Section 4.16 of [POSIX.1]) and
-      apply the expiration correctly.
+      as seconds since the epoch (see Section 4.19 of [POSIX]) and apply
+      the expiration correctly.
 
    *  CAs MUST reject or consider expired any validation record where
       the current time exceeds the persistUntil timestamp.
@@ -806,6 +805,12 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 11.1.  Normative References
 
+   [POSIX]    IEEE and The Open Group, "IEEE Standard for Information
+              Technology Portable Operating System Interface (POSIX(R))
+              Base Specifications, Issue 8", IEEE Std 1003.1-2024 / The
+              Open Group Base Specifications Issue 8 , 2024,
+              <https://pubs.opengroup.org/onlinepubs/9699919904/>.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -836,11 +841,6 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
    [CABF-BR]  CA/Browser Forum, "Baseline Requirements for the Issuance
               and Management of Publicly-Trusted Certificates", 2024,
               <https://cabforum.org/baseline-requirements-documents/>.
-
-   [POSIX.1]  IEEE, "IEEE Standard for Information Technology--Portable
-              Operating System Interface (POSIX(R)) Base Specifications,
-              Issue 7", IEEE Std 1003.1-2017 , 2018,
-              <https://pubs.opengroup.org/onlinepubs/9699919799/>.
 
 Acknowledgments
 
