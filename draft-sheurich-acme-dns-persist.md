@@ -296,7 +296,7 @@ The `persistUntil` parameter provides domain owners with direct control over the
 
 The persistent nature of `dns-persist-01` authorizations means that a valid DNS TXT record can grant control for an extended period, potentially even if the domain owner's intent changes or if the associated ACME account key is compromised. Therefore, explicit mechanisms for revoking or invalidating these persistent authorizations are critical.
 
-The primary method for an Applicant to invalidate a `dns-persist-01` authorization for a domain is to **remove the corresponding DNS TXT record** from the Authorization Domain Name. Once the record is removed, the CA, upon subsequent validation attempts or periodic re-checks, will no longer find the required information, and the authorization will cease to be valid after the expiration of its effective Validation Data Reuse Period.
+The primary method for an Applicant to invalidate a `dns-persist-01` authorization for a domain is to **remove the corresponding DNS TXT record** from the Authorization Domain Name. After the record is removed, new validation attempts for the domain will fail. Any existing authorization obtained via this method will remain valid until it expires as per the CA's Validation Data Reuse Period.
 
 ACME Clients SHOULD provide clear mechanisms for users to:
 
@@ -305,9 +305,7 @@ ACME Clients SHOULD provide clear mechanisms for users to:
 
 Certificate Authorities (CAs) implementing this method MUST:
 
-* Periodically re-check active `dns-persist-01` authorizations to confirm the continued presence and validity of the DNS TXT record. To limit the window of opportunity for misuse after a record is removed, it is RECOMMENDED that these re-checks occur at intervals of a few hours.
-
-* Invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
+* During a validation attempt, invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
 
 * Invalidate authorizations when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise be valid.
 
