@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-27T00:08:42.215153+00:00",
+  "timestamp": "2025-07-31T00:07:49.236152+00:00",
   "repo": "sheurich/draft-sheurich-acme-dns-persist",
   "labels": [
     {
@@ -55,16 +55,31 @@
       "id": "I_kwDOO4VY2c68Bvqk",
       "title": "Should `dns-persist-01` mandate DNSSEC for validation records?",
       "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/1",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "sheurich",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "The `draft-sheurich-acme-dns-persist.txt` currently states in Section 7.1, \"Persistent Record Risks,\" that clients \"SHOULD protect validation records through appropriate DNS security measures, including:... Implementing DNS security extensions (DNSSEC) where possible\".[1] This issue seeks to open a discussion on whether this \"SHOULD\" should be elevated to a \"MUST\" for the `dns-persist-01` challenge method.\n\n**Background:**\n\nThe `dns-persist-01` method is designed for persistent DNS TXT records for domain control validation, particularly for environments where traditional, ephemeral challenge methods are impractical.[1] The draft acknowledges the inherent risks of persistent records, noting that \"DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering\".[1]\n\n**Arguments for Mandating DNSSEC (\"MUST\"):**\n\n1.  **Enhanced Security and Integrity:** Persistent DNS records introduce a longer window of vulnerability. Mandating DNSSEC would provide cryptographic authentication of DNS data, significantly mitigating risks of spoofing and tampering, ensuring that the CA receives authentic validation information.\n2.  **Alignment with Best Practices for Persistent Identifiers:** Other drafts, such as `draft-sheth-identifiers-dns/` (\"Best Practices for Persistent References in DNS\"), explicitly mandate DNSSEC for persistent DNS references to ensure global consistency and spoofing resistance. Given that `dns-persist-01` deals with persistent records, aligning with this stronger security posture seems appropriate.\n3.  **Mitigation of Record Tampering:** The draft's own \"Security Considerations\" section (7.5) highlights \"Record Tampering and Integrity\" as a concern. Mandating DNSSEC directly addresses this vulnerability by providing a verifiable chain of trust for the DNS records.[1]\n\n**Arguments Against Mandating DNSSEC (keeping \"SHOULD\"):**\n\n1.  **Deployability and Adoption:** DNSSEC is not yet universally deployed across all domains and DNS providers. Mandating it could limit the applicability and adoption of `dns-persist-01` in certain environments, such as some IoT deployments or multi-tenant platforms, where DNSSEC implementation might be complex or unavailable.[1]\n2.  **Operational Burden:** Requiring DNSSEC could introduce additional operational complexity for domain owners and DNS providers, potentially hindering the ease of use that ACME aims to provide.\n\n**Question for the Working Group:**\n\nConsidering the security benefits of DNSSEC for persistent records versus the potential impact on deployability, should Section 7.1 of `draft-sheurich-acme-dns-persist.txt` be updated to mandate (i.e., change \"SHOULD\" to \"MUST\") the use of DNSSEC for `dns-persist-01` validation records?\n\nWe invite discussion on the trade-offs and implications of such a change for both security and widespread adoption.\n",
       "createdAt": "2025-06-17T19:40:31Z",
-      "updatedAt": "2025-06-17T19:40:31Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2025-07-30T23:16:57Z",
+      "closedAt": "2025-07-30T23:16:57Z",
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I agree DNSSEC security is nice and it plays well with persistent records.\n\nHowever, the adoption is just too low and this method well essentially be unusable to most if DNSSEC is mandated. Also, some are even starting to bet against DNSSEC in favor of other DNS security measures that may come down the road.\n\nI strongly recommend against mandating DNSSEC.",
+          "createdAt": "2025-07-29T02:43:32Z",
+          "updatedAt": "2025-07-29T02:43:32Z"
+        },
+        {
+          "author": "sheurich",
+          "authorAssociation": "OWNER",
+          "body": "Closing this issue as we are not planning to mandate DNSSEC.",
+          "createdAt": "2025-07-30T23:16:57Z",
+          "updatedAt": "2025-07-30T23:16:57Z"
+        }
+      ]
     },
     {
       "number": 2,
@@ -78,9 +93,17 @@
       "labels": [],
       "body": "This issue seeks to discuss the appropriateness and method of referencing `draft-sheth-identifiers-dns` (\"Best Practices for Persistent References in DNS\") within the `draft-sheurich-acme-dns-persist.txt` document. Both documents deal with aspects of persistent DNS records, but their scope and current maturity levels differ.\n\n**Background:**\n\n* **`draft-sheurich-acme-dns-persist.txt` (dns-persist-01):** Defines a specific ACME challenge method for persistent DNS TXT record validation. It aims to align with CA/Browser Forum Baseline Requirements for persistent DNS TXT record validation.\n* **`draft-sheth-identifiers-dns`:** Provides general best practices for establishing and maintaining persistent associations between a global DNS domain name and various use-case-specific references, with a strong emphasis on mandating DNSSEC for cryptographic verifiability.\n\n**Considerations for Referencing `draft-sheth-identifiers-dns`:**\n\n**Arguments for Incorporating/Referencing (e.g., Informatively):**\n\n1.  **Broader Context and Best Practices:** `draft-sheth-identifiers-dns` offers valuable insights into the general principles and best practices for persistent DNS records, which could provide useful context for implementers of `dns-persist-01`.\n2.  **Security Alignment:** Both drafts address the security of persistent DNS records. `draft-sheth-identifiers-dns`'s strong emphasis on DNSSEC for integrity aligns with the security goals of `dns-persist-01`, which acknowledges \"Record Tampering and Integrity\" as a risk (Section 7.5).\n\n**Arguments Against Normative Incorporation/Referencing at this Stage:**\n\n1.  **Maturity Level (Both are Internet-Drafts):** Both `draft-sheurich-acme-dns-persist.txt` and `draft-sheth-identifiers-dns` are Internet-Drafts. IETF policy generally states that it's inappropriate to use Internet-Drafts as stable reference material. Normatively referencing one draft from another is typically discouraged and can cause significant publication delays.\n2.  **Scope and Mandate Differences:** `draft-sheth-identifiers-dns` *mandates* DNSSEC for persistent references. In contrast, `dns-persist-01` currently *recommends* DNSSEC (\"SHOULD... where possible,\" Section 7.1). A normative reference would implicitly introduce a stronger DNSSEC requirement for `dns-persist-01`, which is a notable policy decision.\n3.  **Stability of Content:** As drafts, their content is subject to change, revision, or even abandonment. A normative reference would tie the stability of `dns-persist-01` to an evolving external document, potentially conflicting with IETF's requirements for stable, archivable normative references.\n\n**Proposed Question for the Working Group:**\n\nGiven the current status of both documents as Internet-Drafts, their differing scopes, and the IETF's referencing policies, should `draft-sheurich-acme-dns-persist.txt` include a reference to `draft-sheth-identifiers-dns`? If so, what type of reference (e.g., informative, with a note about its draft status) would be most appropriate, and what are the implications for the `dns-persist-01` specification, particularly regarding DNSSEC requirements?\n\nWe invite discussion on how best to acknowledge relevant external work while maintaining the stability and clarity of the `dns-persist-01` specification.",
       "createdAt": "2025-06-17T19:48:44Z",
-      "updatedAt": "2025-06-17T19:48:44Z",
+      "updatedAt": "2025-07-29T02:40:19Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "My personal thoughts are the document should proceed with an informative reference to these and minimal incorporating language (for now). The WG members can provide input as the document progresses.",
+          "createdAt": "2025-07-29T02:40:19Z",
+          "updatedAt": "2025-07-29T02:40:19Z"
+        }
+      ]
     },
     {
       "number": 3,
@@ -142,9 +165,17 @@
       "labels": [],
       "body": "The draft should provide clearer guidance on several edge cases to ensure consistent implementation:\n\n- **Multiple TXT Records:** Specify how a CA should behave if multiple TXT records are found at the same Authorization Domain Name. The recommended behavior is to succeed if at least one record is valid.\n- **Malformed `policy` Parameter:** Define the expected behavior if the `policy` parameter is syntactically incorrect (e.g., `policy=subdomains;wildcard`). Should the record be ignored, or should the entire validation fail?\n- **Interaction with CAA:** Add a non-normative note to clarify that this validation method does not bypass standard CAA checking requirements (RFC 8659).",
       "createdAt": "2025-07-23T15:01:06Z",
-      "updatedAt": "2025-07-23T15:01:06Z",
+      "updatedAt": "2025-07-29T02:38:31Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Multiple records: I think only one needs to match (allows multiple CAs for same domain)\nMalformed records: the record that was malformed cannot be used, other clean records can still complete the validation\nInteraction with CAA: I would probably just avoid such a note. Its not relevant in a private PKI setting and its not clear to me anyone would have that interpretation (I guess the records look similar but that's a bit of a stretch).",
+          "createdAt": "2025-07-29T02:38:31Z",
+          "updatedAt": "2025-07-29T02:38:31Z"
+        }
+      ]
     },
     {
       "number": 7,
@@ -158,9 +189,17 @@
       "labels": [],
       "body": "The Security Considerations section could be enhanced with more specific guidance:\n\n- **Account Key Rotation:** Add a note clarifying the operational procedure for key rotation. Specifically, state that the `accounturi` is a stable identifier and does not need to be changed in DNS when the client rotates their account key with the CA.\n- **Certificate Transparency Log Monitoring:** Mention that CT logs can reveal the use of this persistent validation method, making those domains higher-value targets and reinforcing the need for diligent DNS monitoring.",
       "createdAt": "2025-07-23T15:02:10Z",
-      "updatedAt": "2025-07-23T15:02:10Z",
+      "updatedAt": "2025-07-29T02:36:14Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I like the account key rotation note.\n\nA conversation that came up in ACME WG was if we need to clarify that a single ACME account could be associated with multiple URIs to avoid the anonymity leak caused by showing which domains are validated with which accounts. BTW, RFC 8657 put accounturis in DNS and never had to deal with this, so I am still 50/50 if this is actually our concern.\n\nRight now CT alone does not which validation method people used (this is a proposed change which I support). Its also not clear to me that domains using this are particularly vulnerable to DNS attacks given that any dns attack can lead to a mis-issued certificate even if the domain is not using this method.",
+          "createdAt": "2025-07-29T02:36:14Z",
+          "updatedAt": "2025-07-29T02:36:14Z"
+        }
+      ]
     },
     {
       "number": 8,
@@ -174,9 +213,17 @@
       "labels": [],
       "body": "The draft could provide more explicit guidance for implementers:\n\n- **Guidance on Choosing TTLs:** Add a non-normative note to the \"Client Implementation Guidelines\" suggesting a reasonable range for TTL values (e.g., 1 to 24 hours) to balance persistence with timely revocation.\n- **Error Reporting:** Suggest specific ACME error types (from RFC 8555) for common validation failures, such as `urn:ietf:params:acme:error:unauthorized` for a mismatched `accounturi` or `urn:ietf:params:acme:error:malformed` for an unparsable TXT record. This will help client developers provide better debugging feedback to users.",
       "createdAt": "2025-07-23T15:02:29Z",
-      "updatedAt": "2025-07-23T15:02:29Z",
+      "updatedAt": "2025-07-29T02:31:38Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "We may be stepping on some DNSOP toes if we add advise on TTLs. The field is a bit overloaded since it means 2 things: 1) how the DNS infrastructure should handle caching (which can have serious performance implications) and 2) how often CAs should revalidate. avoiding a recommendation in it avoids conflicts with DNSOP recommendations.\n\nI do like the better error types",
+          "createdAt": "2025-07-29T02:31:38Z",
+          "updatedAt": "2025-07-29T02:31:38Z"
+        }
+      ]
     },
     {
       "number": 9,
@@ -206,9 +253,17 @@
       "labels": [],
       "body": "**Summary:**\nThe draft relies on RFC 8659's `issue-value` syntax but does not specify how to handle common parsing edge cases. This ambiguity could lead to interoperability issues between different CA and client implementations when validating the TXT record.\n\n**Details for Implementers:**\nA developer building a CA or client would need clear answers to the following questions to ensure their implementation is robust and interoperable:\n\n*   **Whitespace Handling:** Is whitespace significant? For example, are `policy=wildcard` and `policy = wildcard` equivalent? The specification should explicitly state whether implementations MUST trim leading/trailing whitespace from keys and values.\n*   **Duplicate Parameters:** How should a CA handle a record that contains the same parameter more than once (e.g., `...; policy=subdomains; policy=wildcard`)? Should the record be rejected as malformed, or does the first (or last) instance take precedence?\n*   **Parameter Casing:** The `policy` parameter is explicitly defined as case-insensitive. Does this rule apply to all parameter keys (e.g., is `persistUntil` equivalent to `persistuntil`)? This should be clarified for all current and future parameters.\n\n**Recommendation:**\nAdd a new subsection to \"Challenge Response and Verification\" that explicitly defines the parsing rules for the TXT record RDATA. This section should mandate the following:\n\n1.  Parameter keys MUST be compared in a case-insensitive manner.\n2.  Leading and trailing whitespace around parameter keys and values MUST be ignored.\n3.  The presence of duplicate parameter keys MUST cause the record to be rejected as malformed.\n",
       "createdAt": "2025-07-24T18:31:08Z",
-      "updatedAt": "2025-07-24T18:31:08Z",
+      "updatedAt": "2025-07-29T02:27:27Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I would avoid putting any additional specifications on the RFC 8659 pull in. Doesn't RFC 8659 ABNF syntax definition already provide strict rules on things like whitespace parsing?\n\nIf we feel the  RFC 8659 is not sufficient, we could pull in the ABNF from my draft ( https://birgelee.github.io/birgelee-acme-dns-persist-01/draft-birgelee-acme-dns-persist.html#section-3.1 ) This syntax is largely copied from RFC 8659. I don't really like the \"its like this, but different in this way\" type of standard. If we need to differ, I think there should be a proper definition in the document.",
+          "createdAt": "2025-07-29T02:27:27Z",
+          "updatedAt": "2025-07-29T02:27:27Z"
+        }
+      ]
     },
     {
       "number": 11,
@@ -222,9 +277,17 @@
       "labels": [],
       "body": "**Summary:**\nThe draft now has three mechanisms that determine the lifetime of a validation authorization: the CA's internal `Validation Data Reuse Period`, the DNS record's TTL, and the `persistUntil` timestamp. The exact interaction and order of operations between these three is not perfectly clear, which could lead to different CAs calculating different expiration dates.\n\n**Details for Implementers:**\nAn implementer needs a precise formula for calculating an authorization's final validity to ensure consistent behavior.\n\n*   What is the exact order of operations? Is the final expiration timestamp `min(CA_reuse_period_end_date, persistUntil_timestamp)`?\n*   How does the TTL check relate to this final expiration? Is its role only to determine the *frequency* of re-validation, or can it shorten the absolute lifetime of the authorization itself?\n\n**Recommendation:**\nUpdate Section 4.2 (\"Validation Data Reuse and TTL Handling\") to clarify the order of precedence. The logic should be explicitly stated as follows:\n\n1.  The absolute expiration date of a validation authorization is the **earliest** of:\n    a. The date defined by the CA's internal `Validation Data Reuse Period`.\n    b. The timestamp specified in the `persistUntil` parameter, if present.\n2.  The DNS record's TTL is used to determine the *frequency* at which the CA MUST re-validate the record within its period of validity. This ensures that the record is checked for changes or removal in a timely manner, but does not override the absolute expiration date calculated above.",
       "createdAt": "2025-07-24T18:32:24Z",
-      "updatedAt": "2025-07-24T18:32:24Z",
+      "updatedAt": "2025-07-29T02:22:42Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "there was talk about this at the CA/B Forum, Slaughter's stance which seems to be the direction the ballot is moving in is that validation expiry can be >  persist until.\n\nWe discussed this type of min clause, but Slaughter's stance was it was a simpler flow to interpret the record as:\nA DNS record can lead to a valid authorization so long as the time of the check <= persistUntil\nWhen a valid authorization is generated, its reuse period is max(8h, TTL).\n\nIf we are avoiding any normative language regarding reuse period (which I think we should), the only normative requirement would be that when you check the DNS record, current_timestamp <= persistUntil",
+          "createdAt": "2025-07-29T02:22:42Z",
+          "updatedAt": "2025-07-29T02:22:42Z"
+        }
+      ]
     },
     {
       "number": 12,
@@ -238,9 +301,17 @@
       "labels": [],
       "body": "**Summary:**\nSection 5.5 (\"Revocation and Invalidation\") contains conflicting guidance for CAs on how frequently they must re-check a persistent validation record, using both `SHOULD` and `MUST` in a way that creates ambiguity.\n\n**Details for Implementers:**\nThe text currently states:\n> \"The frequency of these re-checks **SHOULD** be at least as often as the effective Validation Data Reuse Period... and **MUST** occur no less frequently than every 8 hours\"\n\nThis creates a contradiction for an implementer. For example, if a record's TTL is 24 hours, its \"effective reuse period\" becomes 24 hours. The `SHOULD` clause implies a 24-hour re-check is acceptable, but the `MUST` clause requires an 8-hour re-check. Since `MUST` always takes precedence, the `SHOULD` clause is confusing and should be removed or rephrased to prevent misinterpretation.\n\n**Recommendation:**\nSimplify the sentence in Section 5.5 to remove the ambiguity. A clearer statement would be:\n\n> \"Certificate Authorities (CAs) implementing this method MUST periodically re-check active `dns-persist-01` authorizations to confirm the continued presence and validity of the DNS TXT record. These re-checks MUST occur at least as frequently as the record's TTL, but in no case less frequently than every 8 hours.\"",
       "createdAt": "2025-07-24T18:33:16Z",
-      "updatedAt": "2025-07-24T18:33:16Z",
+      "updatedAt": "2025-07-29T02:14:16Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I would personally remove the recheck requirement. I am not aware of any precedent for CAs to recheck an authorization while it is still valid. I think the controls on authorization reuse and validity (which will be included in security considerations) properly define the required recheck rules that will be in effect. Putting a recheck mandate in the validation method seems super confusing to me.",
+          "createdAt": "2025-07-29T02:14:16Z",
+          "updatedAt": "2025-07-29T02:14:16Z"
+        }
+      ]
     },
     {
       "number": 13,
@@ -254,9 +325,17 @@
       "labels": [],
       "body": "**Summary:**\nThe draft provides guidance for CAs but lacks specific, non-normative advice for developers implementing ACME clients. This could lead to inconsistent client behavior, particularly around setting `persistUntil` values and handling errors.\n\n**Details for Implementers:**\nA client developer may have the following questions:\n\n*   **Choosing `persistUntil`:** What is a \"reasonable\" default value for the `persistUntil` parameter? Without guidance, some clients might create very long-lived authorizations by default, while others might require manual configuration.\n*   **Error Handling:** What specific ACME error type (e.g., `urn:ietf:params:acme:error:malformed`, `urn:ietf:params:acme:error:unauthorized`) should a client expect from a CA for failures related to this challenge? For instance, what error is returned for an expired `persistUntil` timestamp or a TXT record with duplicate parameters? Knowing the expected error type is crucial for providing useful feedback to the user.\n\n**Recommendation:**\n1.  Add a non-normative paragraph to the \"Client Implementation Guidelines\" (Section 7.2) suggesting reasonable defaults or configuration strategies for the `persistUntil` value (e.g., \"Clients may wish to default to a 90-day lifetime, aligning with common certificate lifetimes, while allowing users to configure longer periods.\").\n2.  Add a paragraph to \"Challenge Response and Verification\" (Section 4) specifying the ACME error types that CAs should return for the new failure modes (e.g., \"CAs should return a `malformed` error for invalid syntax and an `unauthorized` error if the validation fails due to an expired `persistUntil` timestamp.\").",
       "createdAt": "2025-07-24T18:34:18Z",
-      "updatedAt": "2025-07-24T18:34:18Z",
+      "updatedAt": "2025-07-29T02:08:53Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I am fine with point 2 (recommendations on CA error codes). I generally think it could be helpful to keep this text minimal, but some sane errors could not hurt.\n\nI would probably not recommend saying anything about how to set persistUntil. 1) the ACME client may or may not be actually setting that. It may have been set by a sysadmin that never read this RFC, so its not clear to me this is the right place to put guidance, 2) I am not sure we are going to get this advise right. There are so many considerations that rely largely on external context and break down in the non-web PKI setting, I can't really see a good way of giving general guidance that will be relevant across contexts and though the lifetime of the RFC's usage.  3) some CAs describe persistUnitil as a time bomb for certificates to break. Personally I somewhat agree and I would not set one of these on records I configure in most cases.\n\nSomewhat contrived but possible real world fallout from bad language around persistUntil: one year from now a ton of people use this method and lets say we recommend a persistUntil of +10 years. 11 years from now a bunch of popular websites may go offline because no one was checking a record that otherwise never needed to be updated.",
+          "createdAt": "2025-07-29T02:08:53Z",
+          "updatedAt": "2025-07-29T02:08:53Z"
+        }
+      ]
     },
     {
       "number": 15,
@@ -270,9 +349,147 @@
       "labels": [],
       "body": "## Summary:\nThe draft should clarify that a Certification Authority (CA) may check for a pre-existing dns-persist-01 record upon receiving a new authorization request. If a valid record is found that is already bound to the requesting ACME account, the CA may immediately grant the authorization, bypassing the standard pending challenge flow. This would significantly improve the user experience by providing \"instant validation\" in many cases.\n\n## Problem and Motivation:\nA key benefit of a persistent validation method is the ability to \"set it and forget it.\" An ACME client should be able to request a certificate for a domain that\nalready has a valid dns-persist-01 record in place and receive it without unnecessary delay.\n\nThe current draft does not explicitly describe this accelerated flow. An implementer might assume they must always return a pending challenge, even when sufficient information for validation is already available. Formally specifying this behavior would encourage CAs to implement a more efficient and user-friendly validation process.\n\n## Proposed Solution (A \"Just-in-Time\" Check):\nThe draft should be updated to permit the following optional CA behavior:\n\n1. An ACME client, associated with a specific accounturi, submits a newOrder request to the CA for a domain identifier.\n2. Upon receiving the request, the CA MAY perform a DNS lookup for the corresponding _validation-persist TXT record.\n3. The CA then validates the record's contents. This check MUST include ensuring that the accounturi parameter in the DNS record exactly matches the accounturi of the requesting client.\n4. If the record is present and fully valid (correct issuer, valid timestamp, matching account URI, etc.), the CA MAY immediately move the authorization to the valid state and return it to the client, forgoing the need to issue a pending challenge object.\n5. If no record is found, or if the record is invalid for any reason (including a mismatched accounturi), the CA MUST proceed with the standard flow by returning a pending authorization with a dns-persist-01 challenge.\n\nThis \"just-in-time\" approach provides the speed benefit of pre-validation without requiring CAs to perform impractical, wide-scale DNS scanning.\n\n## Recommendation:\nAdd a paragraph to the \"Challenge Response and Verification\" section (Section 4) to explicitly describe this behavior:\n\n> \"Upon receiving a request for a new authorization, a CA MAY check for the presence of a pre-existing, valid DNS TXT record for the requested domain identifier. If a record is found that meets all requirements of this specification, including that the accounturi parameter matches the ACME account making the request, the CA MAY consider the authorization immediately valid and move it to the valid state. If no such record is found, the CA MUST proceed with the standard challenge process by returning a pending authorization.\"\n",
       "createdAt": "2025-07-24T19:24:18Z",
-      "updatedAt": "2025-07-24T19:24:18Z",
+      "updatedAt": "2025-07-29T01:59:04Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I support the proposed text",
+          "createdAt": "2025-07-29T01:59:03Z",
+          "updatedAt": "2025-07-29T01:59:03Z"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "id": "I_kwDOO4VY2c7C_F2k",
+      "title": "Align timestamp definition with IEEE standard",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/16",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "Update the ACME method draft to use the IEEE standard definition for timestamps, specifying integer values. Cite the IEEE standard in both the document and the CAB form. Avoid referencing the JSON RFC for timestamp definition.\n",
+      "createdAt": "2025-07-28T21:05:36Z",
+      "updatedAt": "2025-07-28T21:10:00Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "sheurich",
+          "authorAssociation": "OWNER",
+          "body": "https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_16",
+          "createdAt": "2025-07-28T21:10:00Z",
+          "updatedAt": "2025-07-28T21:10:00Z"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "I_kwDOO4VY2c7C_F_b",
+      "title": "Remove MPIC and DNSSEC from normative requirements",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/17",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "Update the ACME method draft to remove references to MPIC and DNSSEC from the normative requirements section. Retain these references only in the security considerations section.",
+      "createdAt": "2025-07-28T21:05:55Z",
+      "updatedAt": "2025-07-29T02:44:07Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "\ud83d\udc4d ",
+          "createdAt": "2025-07-29T02:44:07Z",
+          "updatedAt": "2025-07-29T02:44:07Z"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "id": "I_kwDOO4VY2c7C_GF1",
+      "title": "Allow issuer domains as semicolon-separated string",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/18",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "Update the ACME method draft to allow issuer domains to be specified as a semicolon-separated string. This change is intended to support certificate authorities (CAs) that wish to provide multiple issuer domain options.\n",
+      "createdAt": "2025-07-28T21:06:08Z",
+      "updatedAt": "2025-07-29T02:43:50Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "\ud83d\udc4d ",
+          "createdAt": "2025-07-29T02:43:50Z",
+          "updatedAt": "2025-07-29T02:43:50Z"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "id": "I_kwDOO4VY2c7C_GTq",
+      "title": "Minimize prefetching details",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/19",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "Revise the ACME persist method draft to include only a brief mention of prefetching behavior, without expanding on implementation details.\n",
+      "createdAt": "2025-07-28T21:06:36Z",
+      "updatedAt": "2025-07-29T02:00:37Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "to be clear, I think the text proposed in the other issue is sufficiently brief.",
+          "createdAt": "2025-07-29T02:00:37Z",
+          "updatedAt": "2025-07-29T02:00:37Z"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "id": "I_kwDOO4VY2c7C_HXA",
+      "title": "Move MPIC & Validation Data Reuse and TTL Handling sections to security considerations",
+      "url": "https://github.com/sheurich/draft-sheurich-acme-dns-persist/issues/20",
+      "state": "OPEN",
+      "author": "sheurich",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [
+        "enhancement"
+      ],
+      "body": "Remove MPIC & Validation Data Reuse and TTL Handling sections from their current location and relocate them to the security considerations section, per team discussion.\n",
+      "createdAt": "2025-07-28T21:08:50Z",
+      "updatedAt": "2025-07-29T02:01:03Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "birgelee",
+          "authorAssociation": "COLLABORATOR",
+          "body": "\ud83d\udc4d ",
+          "createdAt": "2025-07-29T02:01:03Z",
+          "updatedAt": "2025-07-29T02:01:03Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -314,15 +531,15 @@
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
-      "body": "Adds support for the `persistUntil` parameter to the `dns-persist-01`\nchallenge method. This parameter allows a domain owner to specify a\nhard expiration timestamp for the persistent validation record,\nenhancing security and administrative control.\n\nThe `persistUntil` value is defined as a `NumericDate` from RFC 7519\nto ensure a clear, standards-based implementation.\n\nThis change incorporates the following:\n- Defines the `persistUntil` parameter in the Conventions section.\n- Adds `persistUntil` to the list of valid RDATA parameters.\n- Specifies that `persistUntil` creates a hard expiration that\n  overrides the CAs validation data reuse period.\n- Adds security considerations for the new parameter.\n- Includes examples of its use for FQDN and wildcard validations.\n\nResolves #9\n",
+      "body": "Adds support for the `persistUntil` parameter to the `dns-persist-01`\r\nchallenge method. This parameter allows a domain owner to specify a\r\nhard expiration timestamp for the persistent validation record,\r\nenhancing security and administrative control.\r\n\r\nThe `persistUntil` value is defined as a `NumericDate` from RFC 7519\r\nto ensure a clear, standards-based implementation.\r\n\r\nThis change incorporates the following:\r\n- Defines the `persistUntil` parameter in the Conventions section.\r\n- Adds `persistUntil` to the list of valid RDATA parameters.\r\n- Adds security considerations for the new parameter.\r\n- Includes examples of its use for FQDN and wildcard validations.\r\n\r\nResolves #9\r\nResolves #16\r\n",
       "createdAt": "2025-07-24T18:39:32Z",
-      "updatedAt": "2025-07-25T19:50:25Z",
+      "updatedAt": "2025-07-30T23:01:26Z",
       "baseRepository": "sheurich/draft-sheurich-acme-dns-persist",
       "baseRefName": "main",
       "baseRefOid": "fbf6d49e81caae10fe1986fd3cc8c405d3f83dda",
       "headRepository": "sheurich/draft-sheurich-acme-dns-persist",
       "headRefName": "persistuntil",
-      "headRefOid": "f5c04f3ada16658b554480d76ab239e308c2f820",
+      "headRefOid": "43fb33c9d9986f3c508b6e9c0cf01f6829f11f6b",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
@@ -465,7 +682,7 @@
           "state": "COMMENTED",
           "body": "## Pull Request Overview\n\nThis PR adds support for a `persistUntil` parameter to the `dns-persist-01` challenge method, allowing domain owners to specify a hard expiration timestamp for persistent validation records. This enhances security by providing explicit control over validation record lifetimes.\n\n- Defines the `persistUntil` parameter as a `NumericDate` timestamp from RFC 7519\n- Integrates the parameter into validation requirements and CA processing rules\n- Adds comprehensive security considerations and usage examples\n\n\n\n",
           "createdAt": "2025-07-25T19:50:23Z",
-          "updatedAt": "2025-07-25T19:50:24Z",
+          "updatedAt": "2025-07-30T21:16:50Z",
           "comments": [
             {
               "originalPosition": 5,
@@ -490,6 +707,109 @@
               "body": "[nitpick] The hardcoded timestamp (1721952000) in the example will become outdated quickly. Consider using a relative timestamp or a clearly future date to maintain example relevance over time.\n```suggestion\n_validation-persist.example.com. IN TXT \"authority.example; accounturi=https://ca.example/acct/123; persistUntil=1893456000\"\n```",
               "createdAt": "2025-07-25T19:50:24Z",
               "updatedAt": "2025-07-25T19:50:25Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOO4VY2c63L9G2",
+          "commit": {
+            "abbreviatedOid": "94b3765"
+          },
+          "author": "copilot-pull-request-reviewer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "## Pull Request Overview\n\nThis pull request adds the `persistUntil` parameter to the DNS persist challenge method, allowing domain owners to specify an explicit expiration timestamp for validation records. This enhancement provides better security and administrative control over persistent DNS validation.\n\nKey changes:\n- Defines the `persistUntil` parameter as a POSIX timestamp in the Conventions section\n- Integrates the parameter into the DNS TXT record validation requirements\n- Adds security considerations and operational guidance for the new parameter\n\n\n\n",
+          "createdAt": "2025-07-30T21:17:43Z",
+          "updatedAt": "2025-07-30T22:54:46Z",
+          "comments": [
+            {
+              "originalPosition": 19,
+              "body": "The definition refers to 'Section 4.16 of {{!POSIX.1}}' but the POSIX.1 reference added shows 'IEEE Std 1003.1-2017' from 2018, while Section 4.16 may not exist or may have changed in this version. Consider verifying the correct section reference for epoch time definition in the 2017 standard.\n```suggestion\n: An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.15 of {{!POSIX.1-2017}}.\n```",
+              "createdAt": "2025-07-30T21:17:43Z",
+              "updatedAt": "2025-07-30T21:17:44Z"
+            },
+            {
+              "originalPosition": 28,
+              "body": "Same section reference issue as line 102. Additionally, this requirement creates a potential inconsistency - the text says CAs MUST NOT consider the record valid after the timestamp, but line 176 clarifies that it only affects new validation attempts, not reuse of already-validated data. Consider clarifying this distinction here as well.\n```suggestion\n5. The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.16 of {{!POSIX.1}}. CAs MUST NOT consider this validation record valid for new validation attempts after the specified timestamp, regardless of their validation data reuse period. However, this does not affect the reuse of already-validated data.\n```",
+              "createdAt": "2025-07-30T21:17:44Z",
+              "updatedAt": "2025-07-30T21:17:44Z"
+            },
+            {
+              "originalPosition": 55,
+              "body": "The reference to '(see {{!POSIX.1}})' is incomplete - it should specify the section number like the other references, or if Section 4.16 is indeed correct, it should be '(see Section 4.16 of {{!POSIX.1}})'.\n```suggestion\n- CAs MUST properly parse and interpret the integer timestamp value as seconds since the epoch (see Section 4.16 of {{!POSIX.1}}) and apply the expiration correctly.\n```",
+              "createdAt": "2025-07-30T21:17:44Z",
+              "updatedAt": "2025-07-30T21:17:44Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOO4VY2c63Mtzj",
+          "commit": {
+            "abbreviatedOid": "43fb33c"
+          },
+          "author": "copilot-pull-request-reviewer",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "## Pull Request Overview\n\nThis PR adds support for the `persistUntil` parameter to the dns-persist-01 ACME challenge method, allowing domain owners to specify hard expiration timestamps for validation records to enhance security and administrative control.\n\nKey changes:\n- Introduces the `persistUntil` parameter as an optional RDATA parameter using POSIX timestamp format\n- Adds comprehensive security considerations and operational guidance for the new parameter\n- Includes practical examples demonstrating usage for both FQDN and wildcard validations\n\n\n\n",
+          "createdAt": "2025-07-30T22:55:54Z",
+          "updatedAt": "2025-07-30T22:55:55Z",
+          "comments": [
+            {
+              "originalPosition": 21,
+              "body": "The definition references 'Section 4.19 of {{POSIX}}' but this section number may not accurately correspond to the epoch definition in POSIX standards. Consider verifying the correct section reference or using a more general reference to POSIX epoch time.\n```suggestion\n: An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value MUST be a base-10 encoded integer representing the number of seconds since the epoch, as defined by the POSIX standard.\n```",
+              "createdAt": "2025-07-30T22:55:54Z",
+              "updatedAt": "2025-07-30T22:55:56Z"
+            },
+            {
+              "originalPosition": 85,
+              "body": "The timestamp value 1721952000 in the example should be verified for accuracy. This corresponds to July 26, 2024, but the comment states it's 2024-07-26T00:00:00Z which may not match the actual UTC conversion of this timestamp.\n```suggestion\n_validation-persist.example.com. IN TXT \"authority.example; accounturi=https://ca.example/acct/123; persistUntil=1721856000\"\n```",
+              "createdAt": "2025-07-30T22:55:55Z",
+              "updatedAt": "2025-07-30T22:55:56Z"
+            },
+            {
+              "originalPosition": 99,
+              "body": "Same timestamp accuracy issue as the previous example. The timestamp 1721952000 should be verified to ensure it correctly represents 2024-07-26T00:00:00Z as stated in the comment.\n```suggestion\n_validation-persist.example.com. IN TXT \"authority.example; accounturi=https://ca.example/acct/123; policy=wildcard; persistUntil=1721865600\"\n```",
+              "createdAt": "2025-07-30T22:55:55Z",
+              "updatedAt": "2025-07-30T22:55:56Z"
+            },
+            {
+              "originalPosition": 57,
+              "body": "Repeated reference to 'Section 4.19 of {{POSIX}}' for epoch definition. This section reference should be verified for accuracy across all instances in the document.",
+              "createdAt": "2025-07-30T22:55:55Z",
+              "updatedAt": "2025-07-30T22:55:56Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOO4VY2c63MuW_",
+          "commit": {
+            "abbreviatedOid": "43fb33c"
+          },
+          "author": "sheurich",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "I believe #14 now accurately incorporates #16 and the reviewer comments.",
+          "createdAt": "2025-07-30T22:57:15Z",
+          "updatedAt": "2025-07-30T22:57:15Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDOO4VY2c63MvqG",
+          "commit": {
+            "abbreviatedOid": "43fb33c"
+          },
+          "author": "sheurich",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2025-07-30T23:01:26Z",
+          "updatedAt": "2025-07-30T23:01:26Z",
+          "comments": [
+            {
+              "originalPosition": 85,
+              "body": "```\r\n\u276f date -Iseconds -u -r 1721952000\r\n2024-07-26T00:00:00+00:00\r\n```",
+              "createdAt": "2025-07-30T23:01:26Z",
+              "updatedAt": "2025-07-30T23:01:26Z"
             }
           ]
         }
