@@ -1686,7 +1686,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <a href="#section-7.9" class="section-number selfRef">7.9. </a><a href="#name-revocation-and-invalidation" class="section-name selfRef">Revocation and Invalidation of Persistent Authorizations</a>
         </h3>
 <p id="section-7.9-1">The persistent nature of <code>dns-persist-01</code> authorizations means that a valid DNS TXT record can grant control for an extended period, potentially even if the domain owner's intent changes or if the associated ACME account key is compromised. Therefore, explicit mechanisms for revoking or invalidating these persistent authorizations are critical.<a href="#section-7.9-1" class="pilcrow">¶</a></p>
-<p id="section-7.9-2">The primary method for an Applicant to invalidate a <code>dns-persist-01</code> authorization for a domain is to <strong>remove the corresponding DNS TXT record</strong> from the Authorization Domain Name. Once the record is removed, the CA, upon subsequent validation attempts or periodic re-checks, will no longer find the required information, and the authorization will cease to be valid after the expiration of its effective Validation Data Reuse Period.<a href="#section-7.9-2" class="pilcrow">¶</a></p>
+<p id="section-7.9-2">The primary method for an Applicant to invalidate a <code>dns-persist-01</code> authorization for a domain is to <strong>remove the corresponding DNS TXT record</strong> from the Authorization Domain Name. After the record is removed, new validation attempts for the domain will fail. Any existing authorization obtained via this method will remain valid until it expires as per the CA's Validation Data Reuse Period.<a href="#section-7.9-2" class="pilcrow">¶</a></p>
 <p id="section-7.9-3">ACME Clients SHOULD provide clear mechanisms for users to:<a href="#section-7.9-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.9-4.1">
@@ -1699,16 +1699,13 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <p id="section-7.9-5">Certificate Authorities (CAs) implementing this method MUST:<a href="#section-7.9-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7.9-6.1">
-            <p id="section-7.9-6.1.1">Periodically re-check active <code>dns-persist-01</code> authorizations to confirm the continued presence and validity of the DNS TXT record. To limit the window of opportunity for misuse after a record is removed, it is RECOMMENDED that these re-checks occur at intervals of a few hours.<a href="#section-7.9-6.1.1" class="pilcrow">¶</a></p>
+            <p id="section-7.9-6.1.1">During a validation attempt, invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect <code>issuer-domain-name</code>, missing <code>accounturi</code>, altered <code>policy</code>).<a href="#section-7.9-6.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.9-6.2">
-            <p id="section-7.9-6.2.1">Invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect <code>issuer-domain-name</code>, missing <code>accounturi</code>, altered <code>policy</code>).<a href="#section-7.9-6.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.9-6.2.1">Invalidate authorizations when the current time exceeds the timestamp specified in a <code>persistUntil</code> parameter, even if the DNS TXT record remains present and would otherwise be valid.<a href="#section-7.9-6.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.9-6.3">
-            <p id="section-7.9-6.3.1">Invalidate authorizations when the current time exceeds the timestamp specified in a <code>persistUntil</code> parameter, even if the DNS TXT record remains present and would otherwise be valid.<a href="#section-7.9-6.3.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.9-6.4">
-            <p id="section-7.9-6.4.1">Ensure their internal systems are capable of efficiently handling the invalidation of authorizations when DNS records are removed or become invalid.<a href="#section-7.9-6.4.1" class="pilcrow">¶</a></p>
+            <p id="section-7.9-6.3.1">Ensure their internal systems are capable of efficiently handling the invalidation of authorizations when DNS records are removed or become invalid.<a href="#section-7.9-6.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 <p id="section-7.9-7">While this method provides a persistent signal of control, the fundamental ACME authorization object (as defined in <span>[<a href="#RFC8555" class="cite xref">RFC8555</a>]</span>) remains subject to its own lifecycle, including expiration. A persistent DNS record allows for repeated authorizations, but each authorization object issued by the CA will have a defined validity period, after which it expires unless renewed.<a href="#section-7.9-7" class="pilcrow">¶</a></p>
