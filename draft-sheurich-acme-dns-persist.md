@@ -164,13 +164,7 @@ If no policy parameter is included, the record defaults to FQDN-only validation:
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
-The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account. The server also interprets any `policy` parameter values according to this specification.
-
-## Validation Data Reuse and TTL Handling {#validation-data-reuse-and-ttl-handling}
-
-This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its `Validation Data Reuse Period` (as defined in {{conventions-and-definitions}}). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST adjust the effective validation data reuse period for that specific validation. In such cases, the effective validation data reuse period SHALL be the greater of: (a) the DNS TXT record's TTL, or (b) 8 hours.
-
-CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described in this section. The `persistUntil` parameter indicates when the DNS validation record should no longer be considered valid for new validation attempts. If a `persistUntil` parameter is present in the DNS TXT record, the CA MUST NOT successfully complete a validation attempt after the date and time specified in that parameter. This restriction does not preclude reuse of data that has already been validated.
+The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. The server also interprets any `policy` parameter values according to this specification.
 
 # Wildcard Certificate Validation {#wildcard-certificate-validation}
 
@@ -270,11 +264,21 @@ To enhance the security and integrity of the validation process, CAs and clients
 
 ### DNSSEC
 
-DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data, ensuring that the validation records retrieved by the CA are authentic and have not been tampered with in transit. While this specification does not mandate DNSSEC, its use is strongly recommended to protect against DNS spoofing and cache poisoning attacks. CAs may choose to place greater trust in validations for domains that are DNSSEC-signed.
+DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data. This is a critical security measure that ensures the validation records retrieved by a CA are authentic and have not been tampered with.
+
+For CAs operating within the public WebPKI, the use of DNSSEC is a vital best practice for ensuring the integrity of domain validation. For private or closed PKI environments, DNSSEC is strongly recommended but may not be required, depending on the trust model and risk profile of the specific deployment.
 
 ### Multi-Perspective Validation
 
-Multi-Perspective Issuance Corroboration (MPIC) is a critical defense against localized network attacks, such as BGP hijacking and DNS spoofing. By validating from multiple geographic and network vantage points, a CA can ensure that the DNS validation record is globally visible and not just present on a compromised local network. While this specification does not mandate MPIC as a normative requirement for all implementations, CAs operating in high-security environments or under trust programs that require it (such as the CA/Browser Forum Baseline Requirements) should implement MPIC to ensure robust validation. This practice significantly mitigates the risk of mis-issuance due to targeted network attacks.
+Multi-Perspective Issuance Corroboration (MPIC) is a technique to validate domain control from multiple network vantage points. This is a critical defense against localized network attacks, such as BGP hijacking and DNS spoofing, which could otherwise lead to certificate mis-issuance.
+
+For CAs subject to requirements like the CA/Browser Forum Baseline Requirements, MPIC is essential for robust domain validation. However, for private PKI systems where the network topology is well-known and such localized attacks are not part of the threat model, MPIC may be considered optional.
+
+## Validation Data Reuse and TTL Handling {#validation-data-reuse-and-ttl-handling}
+
+This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its `Validation Data Reuse Period` (as defined in {{conventions-and-definitions}}). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST adjust the effective validation data reuse period for that specific validation. In such cases, the effective validation data reuse period SHALL be the greater of: (a) the DNS TXT record's TTL, or (b) 8 hours.
+
+CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described in this section. The `persistUntil` parameter indicates when the DNS validation record should no longer be considered valid for new validation attempts. If a `persistUntil` parameter is present in the DNS TXT record, the CA MUST NOT successfully complete a validation attempt after the date and time specified in that parameter. This restriction does not preclude reuse of data that has already been validated.
 
 ## persistUntil Parameter Considerations
 
