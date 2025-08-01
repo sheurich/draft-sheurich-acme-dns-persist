@@ -98,7 +98,8 @@ Table of Contents
      7.3.  Subdomain Validation Risks
      7.4.  Cross-CA Validation Reuse
      7.5.  Record Tampering and Integrity
-     7.6.  Revocation and Invalidation of Persistent Authorizations
+     7.6.  persistUntil Parameter Considerations
+     7.7.  Revocation and Invalidation of Persistent Authorizations
    8.  IANA Considerations
      8.1.  ACME Validation Methods Registry
    9.  Implementation Considerations
@@ -109,6 +110,8 @@ Table of Contents
      10.1.  Basic Validation Example (FQDN Only)
      10.2.  Specific Subdomain Validation Example
      10.3.  Wildcard Validation Example
+     10.4.  Validation Example with persistUntil
+     10.5.  Wildcard Validation Example with persistUntil
    11. References
      11.1.  Normative References
      11.2.  Informative References
@@ -209,6 +212,12 @@ Table of Contents
       on validation data, as defined by the CA's practices and
       applicable requirements.
 
+   persistUntil  An optional parameter in the validation record that
+      specifies the timestamp after which the validation record should
+      no longer be considered valid by CAs.  The value MUST be a base-10
+      encoded integer representing the number of seconds since the
+      epoch, as defined in Section 4.19 of [POSIX].
+
 3.  The "dns-persist-01" Challenge
 
    The "dns-persist-01" challenge allows an ACME client to demonstrate
@@ -296,6 +305,14 @@ Table of Contents
    parameter were not present (i.e., the validation applies only to the
    specific FQDN).  CAs MUST ignore any unknown parameter keys.
 
+   1.  The issue-value MAY contain a persistUntil parameter.  If
+       present, the value MUST be a base-10 encoded integer representing
+       the number of seconds since the epoch, as defined in Section 4.19
+       of [POSIX].  CAs MUST NOT consider this validation record valid
+       for new validation attempts after the specified timestamp.
+       However, this does not affect the reuse of already-validated
+       data.
+
    For example, if the ACME client is requesting validation for the FQDN
    "example.com" from a CA that uses "authority.example" as its Issuer
    Domain Name, and the client's account URI is "https://ca.example/
@@ -336,7 +353,13 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
    CAs MAY reuse validation data obtained through this method for the
    duration of their validation data reuse period, subject to the TTL
-   constraints described in this section.
+   constraints described in this section.  The persistUntil parameter
+   indicates when the DNS validation record should no longer be
+   considered valid for new validation attempts.  If a persistUntil
+   parameter is present in the DNS TXT record, the CA MUST NOT
+   successfully complete a validation attempt after the date and time
+   specified in that parameter.  This restriction does not preclude
+   reuse of data that has already been validated.
 
 5.  Wildcard Certificate Validation
 
@@ -540,7 +563,36 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
    systemic DNS security risk that extends beyond this specification, it
    is amplified by any mechanism that relies on DNS for identity.
 
-7.6.  Revocation and Invalidation of Persistent Authorizations
+7.6.  persistUntil Parameter Considerations
+
+   The persistUntil parameter provides domain owners with direct control
+   over the validity period of their validation records.  CAs and
+   clients should be aware of the following considerations:
+
+   *  Domain owners should set expiration dates for validation records
+      that balance security and operational needs.  To avoid unexpected
+      validation failures during certificate renewal, domain owners are
+      advised to:
+
+      -  Align persistUntil values with certificate lifetimes or planned
+         maintenance intervals
+
+      -  Monitor or set reminders for persistUntil expirations
+
+      -  Document persistUntil practices in certificate management
+         procedures
+
+      -  Automate updates to validation records with new persistUntil
+         values during certificate renewal workflows
+
+   *  CAs MUST properly parse and interpret the integer timestamp value
+      as seconds since the epoch (see Section 4.19 of [POSIX]) and apply
+      the expiration correctly.
+
+   *  CAs MUST reject or consider expired any validation record where
+      the current time exceeds the persistUntil timestamp.
+
+7.7.  Revocation and Invalidation of Persistent Authorizations
 
    The persistent nature of dns-persist-01 authorizations means that a
    valid DNS TXT record can grant control for an extended period,
@@ -578,6 +630,11 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
       no longer present or if its content does not meet the requirements
       of this specification (e.g., incorrect issuer-domain-name, missing
       accounturi, altered policy).
+
+   *  CAs MUST also invalidate authorizations when the current time
+      exceeds the timestamp specified in a persistUntil parameter, even
+      if the DNS TXT record remains present and would otherwise be
+      valid.
 
    *  Ensure their internal systems are capable of efficiently handling
       the invalidation of authorizations when DNS records are removed or
@@ -714,9 +771,45 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
        This validation authorizes certificates for "example.com",
        "*.example.com", and specific subdomains like "www.example.com".
 
+10.4.  Validation Example with persistUntil
+
+   For validation of "example.com" with an explicit expiration date:
+
+   1.  Same challenge object format as above.
+
+   2.  Client provisions DNS TXT record including persistUntil:
+
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; persistUntil=1721952000"
+
+   1.  CA validates the record.  This validation is sufficient only for
+       "example.com" and will not be considered valid after the
+       specified timestamp (2024-07-26T00:00:00Z).
+
+10.5.  Wildcard Validation Example with persistUntil
+
+   For validation of "*.example.com" with an explicit expiration date:
+
+   1.  Same challenge object format as above.
+
+   2.  Client provisions DNS TXT record including policy=wildcard and
+       persistUntil:
+
+_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard; persistUntil=1721952000"
+
+   1.  CA validates the record.  This validation authorizes certificates
+       for "example.com", "*.example.com", and specific subdomains, but
+       will not be considered valid after the specified timestamp
+       (2024-07-26T00:00:00Z).
+
 11.  References
 
 11.1.  Normative References
+
+   [POSIX]    IEEE and The Open Group, "IEEE Standard for Information
+              Technology Portable Operating System Interface (POSIX(R))
+              Base Specifications, Issue 8", IEEE Std 1003.1-2024 / The
+              Open Group Base Specifications Issue 8 , 2024,
+              <https://pubs.opengroup.org/onlinepubs/9699919904/>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
