@@ -573,10 +573,8 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
    reuse.  The period for which a CA may rely on validation data is its
    Validation Data Reuse Period (as defined in Section 2).  However, if
    the DNS TXT record's Time-to-Live (TTL) is shorter than this period,
-   the CA MUST adjust the effective validation data reuse period for
-   that specific validation.  In such cases, the effective validation
-   data reuse period SHALL be the greater of: (a) the DNS TXT record's
-   TTL, or (b) 8 hours.
+   the CA MUST treat the record's TTL as the effective validation data
+   reuse period for that specific validation.
 
    CAs MAY reuse validation data obtained through this method for the
    duration of their validation data reuse period, subject to the TTL
