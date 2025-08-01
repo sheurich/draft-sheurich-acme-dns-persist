@@ -78,11 +78,10 @@ The record format is based on the "issue-value" syntax from {{!RFC8659}}, incorp
 This validation method is designed to provide a robust and persistent mechanism for domain control verification within the ACME protocol. Its technical design incorporates widely adopted security principles and best practices for domain validation, ensuring high assurance regardless of the specific CA policy environment. These principles include, but are not limited to:
 
 1. The use of a well-defined, unique DNS label (e.g., "_validation-persist") for persistent validation records, minimizing potential conflicts.
-2. Mandatory multi-perspective validation by the Certificate Authority, enhancing resilience against localized DNS attacks and ensuring global visibility of the record (see {{multi-perspective-validation}}).
-3. Consideration of DNS TTL values when determining the effective validity period of an authorization, balancing persistence with responsiveness to DNS changes (see {{validation-data-reuse-and-ttl-handling}}).
-4. Explicit binding of the domain validation to a specific ACME account through a unique identifier, establishing clear accountability and enhancing security against unauthorized use.
+2. Consideration of DNS TTL values when determining the effective validity period of an authorization, balancing persistence with responsiveness to DNS changes (see {{validation-data-reuse-and-ttl-handling}}).
+3. Explicit binding of the domain validation to a specific ACME account through a unique identifier, establishing clear accountability and enhancing security against unauthorized use.
 
-Certification Authorities operating under various trust program requirements will find this technical framework suitable for their domain validation needs, as its design inherently supports robust and auditable validation practices (see {{multi-perspective-validation}}).
+Certification Authorities operating under various trust program requirements will find this technical framework suitable for their domain validation needs, as its design inherently supports robust and auditable validation practices.
 
 # Conventions and Definitions {#conventions-and-definitions}
 
@@ -165,17 +164,7 @@ If no policy parameter is included, the record defaults to FQDN-only validation:
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
-The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct issuer-domain-name and a valid accounturi for the requesting account. The server also interprets any `policy` parameter values according to this specification.
-
-## Multi-Perspective Validation {#multi-perspective-validation}
-
-CAs performing validations using the "dns-persist-01" method MUST implement Multi-Perspective Issuance Corroboration. To count as corroborating, a Network Perspective MUST observe the same challenge information as the Primary Network Perspective.
-
-## Validation Data Reuse and TTL Handling {#validation-data-reuse-and-ttl-handling}
-
-This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its `Validation Data Reuse Period` (as defined in {{conventions-and-definitions}}). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST adjust the effective validation data reuse period for that specific validation. In such cases, the effective validation data reuse period SHALL be the greater of: (a) the DNS TXT record's TTL, or (b) 8 hours.
-
-CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described in this section. The `persistUntil` parameter indicates when the DNS validation record should no longer be considered valid for new validation attempts. If a `persistUntil` parameter is present in the DNS TXT record, the CA MUST NOT successfully complete a validation attempt after the date and time specified in that parameter. This restriction does not preclude reuse of data that has already been validated.
+The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. The server also interprets any `policy` parameter values according to this specification.
 
 # Wildcard Certificate Validation {#wildcard-certificate-validation}
 
@@ -267,7 +256,29 @@ The persistent nature of validation records raises concerns about potential reus
 
 DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.
 
-Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures (such as DNSSEC). An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
+Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures. Using DNSSEC is a recommended mechanism for this purpose. An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
+
+## DNS Security Measures {#dns-security-measures}
+
+To enhance the security and integrity of the validation process, CAs and clients should consider implementing advanced DNS security measures.
+
+### DNSSEC
+
+DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data. This is a critical security measure that ensures the validation records retrieved by a CA are authentic and have not been tampered with.
+
+For CAs operating within the public WebPKI, the use of DNSSEC is a vital best practice for ensuring the integrity of domain validation. For private or closed PKI environments, DNSSEC is strongly recommended but may not be required, depending on the trust model and risk profile of the specific deployment.
+
+### Multi-Perspective Validation
+
+Multi-Perspective Issuance Corroboration (MPIC) is a technique to validate domain control from multiple network vantage points. This is a critical defense against localized network attacks, such as BGP hijacking and DNS spoofing, which could otherwise lead to certificate mis-issuance.
+
+For CAs subject to requirements like the CA/Browser Forum Baseline Requirements, MPIC is essential for robust domain validation. However, for private PKI systems where the network topology is well-known and such localized attacks are not part of the threat model, MPIC may be considered optional.
+
+## Validation Data Reuse and TTL Handling {#validation-data-reuse-and-ttl-handling}
+
+This validation method is explicitly designed for persistence and reuse. The period for which a CA may rely on validation data is its `Validation Data Reuse Period` (as defined in {{conventions-and-definitions}}). However, if the DNS TXT record's Time-to-Live (TTL) is shorter than this period, the CA MUST treat the record's TTL as the effective validation data reuse period for that specific validation.
+
+CAs MAY reuse validation data obtained through this method for the duration of their validation data reuse period, subject to the TTL constraints described in this section. The `persistUntil` parameter indicates when the DNS validation record should no longer be considered valid for new validation attempts. If a `persistUntil` parameter is present in the DNS TXT record, the CA MUST NOT successfully complete a validation attempt after the date and time specified in that parameter. This restriction does not preclude reuse of data that has already been validated.
 
 ## persistUntil Parameter Considerations
 
@@ -285,7 +296,7 @@ The `persistUntil` parameter provides domain owners with direct control over the
 
 The persistent nature of `dns-persist-01` authorizations means that a valid DNS TXT record can grant control for an extended period, potentially even if the domain owner's intent changes or if the associated ACME account key is compromised. Therefore, explicit mechanisms for revoking or invalidating these persistent authorizations are critical.
 
-The primary method for an Applicant to invalidate a `dns-persist-01` authorization for a domain is to **remove the corresponding DNS TXT record** from the Authorization Domain Name. Once the record is removed, the CA, upon subsequent validation attempts or periodic re-checks, will no longer find the required information, and the authorization will cease to be valid after the expiration of its effective Validation Data Reuse Period.
+The primary method for an Applicant to invalidate a `dns-persist-01` authorization for a domain is to **remove the corresponding DNS TXT record** from the Authorization Domain Name. After the record is removed, new validation attempts for the domain will fail. Any existing authorization obtained via this method will remain valid until it expires as per the CA's Validation Data Reuse Period.
 
 ACME Clients SHOULD provide clear mechanisms for users to:
 
@@ -294,11 +305,9 @@ ACME Clients SHOULD provide clear mechanisms for users to:
 
 Certificate Authorities (CAs) implementing this method MUST:
 
-* Periodically re-check active `dns-persist-01` authorizations to confirm the continued presence and validity of the DNS TXT record. The frequency of these re-checks SHOULD be at least as often as the effective Validation Data Reuse Period for that specific validation (as determined per {{validation-data-reuse-and-ttl-handling}}), and MUST occur no less frequently than every 8 hours to promptly detect and act upon record removal or modification.
+* During a validation attempt, invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
 
-* Invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
-
-* CAs MUST also invalidate authorizations when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise be valid.
+* Invalidate authorizations when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise be valid.
 
 * Ensure their internal systems are capable of efficiently handling the invalidation of authorizations when DNS records are removed or become invalid.
 
@@ -323,7 +332,6 @@ IANA is requested to register the following entry in the "ACME Validation Method
 Certificate Authorities implementing this validation method should consider:
 
 - Establishing clear policies for Issuer Domain Name disclosure in Certificate Policies and Certification Practice Statements
-- Implementing robust multi-perspective validation infrastructure
 - Developing procedures for handling validation record TTL variations
 - Creating account security monitoring and incident response procedures
 - Providing clear documentation for clients on proper record construction
@@ -370,7 +378,7 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
-3. CA validates the record through multi-perspective DNS queries. This validation is sufficient only for "example.com".
+3. CA validates the record through DNS queries. This validation is sufficient only for "example.com".
 
 ## Specific Subdomain Validation Example {#specific-subdomain-validation-example}
 
@@ -398,7 +406,7 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard"
 ~~~
 
-3. CA validates the record through multi-perspective DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
+3. CA validates the record through DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
 
 ## Validation Example with persistUntil
 
