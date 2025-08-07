@@ -3,10 +3,8 @@ title: "Automated Certificate Management Environment (ACME) Challenge for Persis
 abbrev: "ACME Persistent DNS Challenge"
 category: std
 docname: draft-sheurich-acme-dns-persist-latest
-submissiontype: IETF
 number:
 date: 2025-06-23
-consensus: true
 v: 3
 area: "Security"
 workgroup: "Automated Certificate Management Environment"
@@ -22,16 +20,15 @@ venue:
   mail: "acme@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/acme/"
   github: "sheurich/draft-sheurich-acme-dns-persist"
-  latest: "https://sheurich.github.io/draft-sheurich-acme-dns-persist/draft-sheurich-acme-dns-persist.html"
 
 author:
  -
-   fullname: "Shiloh Heurich"
-   organization: Fastly
+   name: "Shiloh Heurich"
+   org: Fastly
    email: "sheurich@fastly.com"
  -
-   fullname: "Henry Birge-Lee"
-   organization: "Princeton University"
+   name: "Henry Birge-Lee"
+   org: "Princeton University"
    email: "birgelee@princeton.edu"
 
 informative:
@@ -98,7 +95,7 @@ Certification Authorities operating under various trust program requirements wil
 
 # Conventions and Definitions {#conventions-and-definitions}
 
-{::boilerplate bcp14}
+{::boilerplate bcp14-tagged}
 
 Authorization Domain Name
 : The domain name at which the validation TXT record is provisioned. It is formed by prepending the label "_validation-persist" to the FQDN being validated.
@@ -170,6 +167,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 ~~~
 
 The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. See {{handling-of-multiple-records}} for detailed requirements. The server also interprets any `policy` parameter values according to this specification.
+
 ## Handling of Multiple Records {#handling-of-multiple-records}
 
 A DNS query for the Authorization Domain Name may return multiple TXT records. When multiple records are present, a CA MUST iterate through them to find one that meets the validation requirements. The validation is successful if at least one record satisfies all of the following conditions:
@@ -211,7 +209,7 @@ If the `policy` parameter is absent, or if it is present but its value does not 
 
 See {{subdomain-validation-risks}} for important security implications of enabling subdomain validation.
 
-*Example: Scope of 'wildcard' Policy*
+Example: Scope of 'wildcard' Policy
 
 For a persistent TXT record provisioned at `_validation-persist.example.com` with a `policy` of `wildcard`, a CA may issue certificates for `example.com`, `www.example.com`, `app.example.com`, and `*.example.com`.
 
