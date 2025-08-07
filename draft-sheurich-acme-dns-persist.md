@@ -302,11 +302,11 @@ ACME Clients SHOULD provide clear mechanisms for users to:
 
 Certificate Authorities (CAs) implementing this method MUST:
 
-* During a validation attempt, invalidate an authorization if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
+* During a validation attempt, fail the validation if the corresponding DNS TXT record is no longer present or if its content does not meet the requirements of this specification (e.g., incorrect `issuer-domain-name`, missing `accounturi`, altered `policy`).
 
-* Invalidate authorizations when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise be valid.
+* Reject new validation attempts when the current time exceeds the timestamp specified in a `persistUntil` parameter, even if the DNS TXT record remains present and would otherwise satisfy all other validation requirements.
 
-* Ensure their internal systems are capable of efficiently handling the invalidation of authorizations when DNS records are removed or become invalid.
+* Ensure their internal systems are capable of efficiently handling the validation failure when DNS records are removed or become invalid.
 
 While this method provides a persistent signal of control, the fundamental ACME authorization object (as defined in {{!RFC8555}}) remains subject to its own lifecycle, including expiration. A persistent DNS record allows for repeated authorizations, but each authorization object issued by the CA will have a defined validity period, after which it expires unless renewed.
 
