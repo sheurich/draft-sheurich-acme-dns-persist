@@ -156,7 +156,17 @@ For example, if the ACME client is requesting validation for the FQDN "example.c
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
-The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. The server also interprets any `policy` parameter values according to this specification.
+The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. See {{handling-of-multiple-records}} for detailed requirements. The server also interprets any `policy` parameter values according to this specification.
+## Handling of Multiple Records {#handling-of-multiple-records}
+
+A DNS query for the Authorization Domain Name may return multiple TXT records. When multiple records are present, a CA MUST iterate through them to find one that meets the validation requirements. The validation is successful if at least one record satisfies all of the following conditions:
+
+1. The record conforms to all requirements specified in this document
+2. The `issuer-domain-name` in the record matches the CA's Issuer Domain Name
+3. The `accounturi` parameter exactly matches the URI of the ACME account making the request
+4. Any `persistUntil` parameter, if present, has not expired
+
+Malformed records or records intended for other CAs MUST be ignored. If no single record meets all requirements, the validation attempt fails. This approach allows multiple CAs to have persistent validation records for the same domain simultaneously.
 
 ## Just-in-Time Validation {#just-in-time-validation}
 
@@ -169,7 +179,7 @@ If such a record exists and satisfies all of the following conditions, the CA MA
 3. The `accounturi` parameter exactly matches the URI of the ACME account making the request
 4. Any `persistUntil` parameter, if present, has not expired
 
-If the DNS TXT record is absent, malformed, or fails to meet any of the above requirements, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
+If no DNS TXT record meets all of the above requirements, or if the records are absent, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
 
 This mechanism enables efficient reuse of persistent validation records while maintaining the security properties of the validation method.
 
