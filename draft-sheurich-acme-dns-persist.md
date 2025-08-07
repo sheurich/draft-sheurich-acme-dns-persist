@@ -30,6 +30,10 @@ author:
    name: "Henry Birge-Lee"
    org: "Princeton University"
    email: "birgelee@princeton.edu"
+ -
+   name: "Michael Slaughter"
+   org: "Amazon Trust Services"
+   email: "slghtr@amazon.com"
 
 informative:
   CABF-BR:
