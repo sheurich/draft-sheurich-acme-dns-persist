@@ -333,6 +333,16 @@ Certificate Authorities implementing this validation method should consider:
 - Creating account security monitoring and incident response procedures
 - Providing clear documentation for clients on proper record construction
 
+### Error Handling
+
+When implementing the "dns-persist-01" validation method, Certificate Authorities SHOULD return appropriate ACME error codes to provide clear feedback on validation failures. Specifically:
+
+- CAs SHOULD return a `malformed` error (as defined in {{!RFC8555}}) when the TXT record has invalid syntax, such as duplicate parameters, invalid timestamp format in the `persistUntil` parameter, or other syntactic violations of the record format specified in this document.
+
+- CAs SHOULD return an `unauthorized` error (as defined in {{!RFC8555}}) when validation fails because the `persistUntil` timestamp has expired, indicating that the validation record is no longer considered valid for new validation attempts.
+
+These error codes help ACME clients distinguish between different types of validation failures and take appropriate corrective actions.
+
 ## Client Implementation Guidelines {#client-implementation-guidelines}
 
 ACME clients implementing this validation method should consider:
