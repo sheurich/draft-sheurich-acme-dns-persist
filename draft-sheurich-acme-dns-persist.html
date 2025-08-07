@@ -1378,7 +1378,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <dd class="break"></dd>
 <dt id="section-2-2.9">persistUntil</dt>
         <dd style="margin-left: 1.5em" id="section-2-2.10">
-          <p id="section-2-2.10.1">An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value <span class="bcp14">MUST</span> be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.19 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>.<a href="#section-2-2.10.1" class="pilcrow">¶</a></p>
+          <p id="section-2-2.10.1">An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value <span class="bcp14">MUST</span> be a base-10 encoded integer representing a UNIX timestamp (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds).<a href="#section-2-2.10.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1456,7 +1456,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-4-6">If the <code>policy</code> parameter is absent, or if its value is anything other than <code>wildcard</code>, the CA <span class="bcp14">MUST</span> proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs <span class="bcp14">MUST</span> ignore any unknown parameter keys.<a href="#section-4-6" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4-7">
 <li id="section-4-7.1">
-          <p id="section-4-7.1.1">The issue-value <span class="bcp14">MAY</span> contain a <code>persistUntil</code> parameter. If present, the value <span class="bcp14">MUST</span> be a base-10 encoded integer representing the number of seconds since the epoch, as defined in Section 4.19 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>. CAs <span class="bcp14">MUST NOT</span> consider this validation record valid for new validation attempts after the specified timestamp. However, this does not affect the reuse of already-validated data.<a href="#section-4-7.1.1" class="pilcrow">¶</a></p>
+          <p id="section-4-7.1.1">The issue-value <span class="bcp14">MAY</span> contain a <code>persistUntil</code> parameter. If present, the value <span class="bcp14">MUST</span> be a base-10 encoded integer representing a UNIX timestamp (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds). CAs <span class="bcp14">MUST NOT</span> consider this validation record valid for new validation attempts after the specified timestamp. However, this does not affect the reuse of already-validated data.<a href="#section-4-7.1.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
 <p id="section-4-8">For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", it might provision:<a href="#section-4-8" class="pilcrow">¶</a></p>
@@ -1707,7 +1707,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
             </ul>
 </li>
           <li class="normal" id="section-7.8-2.2">
-            <p id="section-7.8-2.2.1">CAs <span class="bcp14">MUST</span> properly parse and interpret the integer timestamp value as seconds since the epoch (see Section 4.19 of <span>[<a href="#POSIX" class="cite xref">POSIX</a>]</span>) and apply the expiration correctly.<a href="#section-7.8-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.8-2.2.1">CAs <span class="bcp14">MUST</span> properly parse and interpret the integer timestamp value as a UNIX timestamp (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds) and apply the expiration correctly.<a href="#section-7.8-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.8-2.3">
             <p id="section-7.8-2.3.1">CAs <span class="bcp14">MUST</span> reject or consider expired any validation record where the current time exceeds the <code>persistUntil</code> timestamp.<a href="#section-7.8-2.3.1" class="pilcrow">¶</a></p>
@@ -2015,10 +2015,6 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
-<dt id="POSIX">[POSIX]</dt>
-        <dd>
-<span class="refAuthor">IEEE and The Open Group</span>, <span class="refTitle">"IEEE Standard for Information Technology Portable Operating System Interface (POSIX(R)) Base Specifications, Issue 8"</span>, <span class="seriesInfo">IEEE Std 1003.1-2024 / The Open Group Base Specifications Issue 8 </span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://pubs.opengroup.org/onlinepubs/9699919904/">https://pubs.opengroup.org/onlinepubs/9699919904/</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>

@@ -213,8 +213,8 @@ Table of Contents
    persistUntil  An optional parameter in the validation record that
       specifies the timestamp after which the validation record should
       no longer be considered valid by CAs.  The value MUST be a base-10
-      encoded integer representing the number of seconds since the
-      epoch, as defined in Section 4.19 of [POSIX].
+      encoded integer representing a UNIX timestamp (the number of
+      seconds since 1970-01-01T00:00:00Z ignoring leap seconds).
 
 3.  The "dns-persist-01" Challenge
 
@@ -299,11 +299,11 @@ Table of Contents
 
    1.  The issue-value MAY contain a persistUntil parameter.  If
        present, the value MUST be a base-10 encoded integer representing
-       the number of seconds since the epoch, as defined in Section 4.19
-       of [POSIX].  CAs MUST NOT consider this validation record valid
-       for new validation attempts after the specified timestamp.
-       However, this does not affect the reuse of already-validated
-       data.
+       a UNIX timestamp (the number of seconds since
+       1970-01-01T00:00:00Z ignoring leap seconds).  CAs MUST NOT
+       consider this validation record valid for new validation attempts
+       after the specified timestamp.  However, this does not affect the
+       reuse of already-validated data.
 
    For example, if the ACME client is requesting validation for the FQDN
    "example.com" from a CA that uses "authority.example" as its Issuer
@@ -620,8 +620,9 @@ Table of Contents
          values during certificate renewal workflows
 
    *  CAs MUST properly parse and interpret the integer timestamp value
-      as seconds since the epoch (see Section 4.19 of [POSIX]) and apply
-      the expiration correctly.
+      as a UNIX timestamp (the number of seconds since
+      1970-01-01T00:00:00Z ignoring leap seconds) and apply the
+      expiration correctly.
 
    *  CAs MUST reject or consider expired any validation record where
       the current time exceeds the persistUntil timestamp.
@@ -840,12 +841,6 @@ Table of Contents
 11.  References
 
 11.1.  Normative References
-
-   [POSIX]    IEEE and The Open Group, "IEEE Standard for Information
-              Technology Portable Operating System Interface (POSIX(R))
-              Base Specifications, Issue 8", IEEE Std 1003.1-2024 / The
-              Open Group Base Specifications Issue 8 , 2024,
-              <https://pubs.opengroup.org/onlinepubs/9699919904/>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
