@@ -158,6 +158,10 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 
 The ACME server verifies the challenge by performing a DNS lookup for the TXT record at the Authorization Domain Name and checking that its RDATA conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. The server also interprets any `policy` parameter values according to this specification.
 
+## Just-in-Time Validation {#just-in-time-validation}
+
+Upon receiving a request for a new authorization, a CA MAY check for the presence of a pre-existing, valid DNS TXT record for the requested domain identifier. If a record is found that meets all requirements of this specification, including that the `accounturi` parameter matches the ACME account making the request, the CA MAY consider the authorization immediately valid and move it to the valid state. If no such record is found, the CA MUST proceed with the standard challenge process by returning a pending authorization.
+
 # Wildcard Certificate Validation {#wildcard-certificate-validation}
 
 This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard` parameter value.
