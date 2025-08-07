@@ -162,7 +162,7 @@ If the `policy` parameter is absent, or if its value is anything other than `wil
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", it might provision:
 
-~~~
+~~~ dns
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
@@ -404,7 +404,7 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 
 2. Client provisions DNS TXT record (note the absence of a `policy` parameter for scope):
 
-~~~
+~~~ dns
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
@@ -419,7 +419,7 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 
 2. Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard`:
 
-~~~
+~~~ dns
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard"
 ~~~
 
@@ -433,7 +433,7 @@ For validation of "example.com" with an explicit expiration date:
 
 2. Client provisions DNS TXT record including `persistUntil`:
 
-~~~
+~~~ dns
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; persistUntil=1721952000"
 ~~~
 
@@ -447,7 +447,7 @@ For validation of "*.example.com" with an explicit expiration date:
 
 2. Client provisions DNS TXT record including `policy=wildcard` and `persistUntil`:
 
-~~~
+~~~ dns
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard; persistUntil=1721952000"
 ~~~
 
@@ -456,7 +456,7 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 --- back
 
 # Acknowledgments
-{:numbered="false"}
+{:unnumbered}
 
 The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.
 
