@@ -55,6 +55,14 @@ informative:
         name: A. Kaizer
         org: Verisign Labs
     date: 2025-04-22
+  birgelee-sc082-security:
+    title: "Security of SC-082 Redux"
+    author:
+      -
+        ins: H. Birge-Lee
+        name: Henry Birge-Lee
+    date: 2025
+
 
 normative:
 
@@ -455,6 +463,12 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 # Acknowledgments
 {:unnumbered}
 
-The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.
+The authors acknowledge prior community work that directly informed this specification:
 
-Thanks to the contributors and reviewers who provided feedback on early versions of this document.
+* The CA/Browser Forum ballot proposals to enable persistent / static DNS Domain Control Validation signals in the Baseline Requirements, in particular Ballot SC-082 ("Clarify CA Assisted DNS Validation under 3.2.2.4.7", authored by Michael Slaughter) and the active proposal SC-088 ("DNS TXT Record with Persistent Value DCV Method", GitHub PR #608, also authored by Michael Slaughter). These efforts provided the policy framing and initial industry discussion motivating standardization of a reusable ACME DNS validation record.
+* The formal and empirical security analysis of static / persistent DCV methods performed by Henry Birge-Lee ("Proof of static DCV security" presentation, the "Security of SC-082 Redux" paper {{birgelee-sc082-security}}, and related research), which helped clarify the threat model and informed the security considerations in this document.
+* The Delegated DNS Domain Validation (DDDV) Threat Modeling Tiger Team discussions and document ("Validation SC - Delegated DNS Domain Validation (DDDV) Threat Model"), whose participants contributed to broad threat enumeration; notable contributors include Michael Slaughter (Amazon Trust Services), Corey Bonnell (DigiCert), Clint Wilson (Apple), and Martijn Katerbarg (Sectigo).
+
+The authors also thank members of the ACME Working Group and CA/Browser Forum who provided early review, critique, and operational perspectives on persistent validation records.
+
+Any errors or omissions are the responsibility of the authors.
