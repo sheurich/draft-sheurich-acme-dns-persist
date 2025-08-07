@@ -170,16 +170,11 @@ Malformed records or records intended for other CAs MUST be ignored. If no singl
 
 ## Just-in-Time Validation {#just-in-time-validation}
 
-When processing a new authorization request, a CA MAY perform an immediate DNS lookup for a `_validation-persist` TXT record at the Authorization Domain Name corresponding to the requested domain identifier.
+When processing a new authorization request, a CA MAY perform an immediate DNS lookup for `_validation-persist` TXT records at the Authorization Domain Name corresponding to the requested domain identifier.
 
-If such a record exists and satisfies all of the following conditions, the CA MAY transition the authorization directly to the "valid" status without requiring a challenge response:
+If one or more such records exist, the CA MUST evaluate them according to the requirements specified in {{handling-of-multiple-records}}. If at least one record meets all validation requirements, the CA MAY transition the authorization directly to the "valid" status without requiring a challenge response.
 
-1. The record conforms to all requirements specified in this document
-2. The `issuer-domain-name` in the record matches the CA's Issuer Domain Name
-3. The `accounturi` parameter exactly matches the URI of the ACME account making the request
-4. Any `persistUntil` parameter, if present, has not expired
-
-If no DNS TXT record meets all of the above requirements, or if the records are absent, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
+If no DNS TXT record meets the validation requirements, or if the records are absent, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
 
 This mechanism enables efficient reuse of persistent validation records while maintaining the security properties of the validation method.
 
