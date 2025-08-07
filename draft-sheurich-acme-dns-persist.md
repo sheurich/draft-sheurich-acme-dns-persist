@@ -160,7 +160,18 @@ The ACME server verifies the challenge by performing a DNS lookup for the TXT re
 
 ## Just-in-Time Validation {#just-in-time-validation}
 
-Upon receiving a request for a new authorization, a CA MAY check for the presence of a pre-existing, valid DNS TXT record for the requested domain identifier. If a record is found that meets all requirements of this specification, including that the `accounturi` parameter matches the ACME account making the request, the CA MAY consider the authorization immediately valid and move it to the valid state. If no such record is found, the CA MUST proceed with the standard challenge process by returning a pending authorization.
+When processing a new authorization request, a CA MAY perform an immediate DNS lookup for a `_validation-persist` TXT record at the Authorization Domain Name corresponding to the requested domain identifier.
+
+If such a record exists and satisfies all of the following conditions, the CA MAY transition the authorization directly to the "valid" status without requiring a challenge response:
+
+1. The record conforms to all requirements specified in this document
+2. The `issuer-domain-name` in the record matches the CA's Issuer Domain Name
+3. The `accounturi` parameter exactly matches the URI of the ACME account making the request
+4. Any `persistUntil` parameter, if present, has not expired
+
+If the DNS TXT record is absent, malformed, or fails to meet any of the above requirements, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
+
+This mechanism enables efficient reuse of persistent validation records while maintaining the security properties of the validation method.
 
 # Wildcard Certificate Validation {#wildcard-certificate-validation}
 
