@@ -226,6 +226,10 @@ CAs SHOULD implement robust account security measures, including:
 
 Clients SHOULD protect their ACME account keys with the same level of security as they would protect private keys for high-value certificates.
 
+### Account Key Rotation
+
+The `accounturi` parameter is a stable identifier for the ACME account that persists across key rotations. When a client rotates their account key following the procedures defined in {{!RFC8555}}, Section 7.3.5, the `accounturi` remains unchanged. Therefore, existing DNS TXT records containing the `accounturi` parameter do not require modification when performing account key rotations.
+
 ## Subdomain Validation Risks {#subdomain-validation-risks}
 
 Enabling subdomain validation via `policy=wildcard` creates significant security implications. Organizations using this feature MUST carefully control subdomain delegation and monitor for unauthorized subdomains. This policy value serves as the explicit mechanism for domain owners to opt-in to broader validation scopes.
