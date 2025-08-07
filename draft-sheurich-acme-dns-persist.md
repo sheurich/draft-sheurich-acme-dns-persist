@@ -41,6 +41,19 @@ informative:
       org: "CA/Browser Forum"
     date: 2024
     target: "https://cabforum.org/baseline-requirements-documents/"
+  draft-sheth-identifiers-dns:
+    target: https://datatracker.ietf.org/doc/draft-sheth-identifiers-dns/
+    title: "Best Practices for Persistent References in DNS"
+    author:
+      -
+        ins: S. Sheth
+        name: S. Sheth
+        org: Verisign Labs
+      -
+        ins: A. Kaizer
+        name: A. Kaizer
+        org: Verisign Labs
+    date: 2025-04-22
 
 normative:
   POSIX:
