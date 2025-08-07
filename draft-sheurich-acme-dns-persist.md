@@ -97,11 +97,11 @@ Certification Authorities operating under various trust program requirements wil
 
 {::boilerplate bcp14-tagged}
 
-Authorization Domain Name
-: The domain name at which the validation TXT record is provisioned. It is formed by prepending the label "_validation-persist" to the FQDN being validated.
-
 DNS TXT Record Persistent DCV Domain Label
 : The label "_validation-persist" as specified in this document. This label is consistent with industry practices for persistent domain validation.
+
+Authorization Domain Name
+: The domain name at which the validation TXT record is provisioned. It is formed by prepending the DNS TXT Record Persistent DCV Domain Label to the FQDN being validated.
 
 Issuer Domain Name
 : A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
