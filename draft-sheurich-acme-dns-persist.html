@@ -7,6 +7,7 @@
 <title>Automated Certificate Management Environment (ACME) Challenge for Persistent DNS TXT Record Validation</title>
 <meta content="Shiloh Heurich" name="author">
 <meta content="Henry Birge-Lee" name="author">
+<meta content="Michael Slaughter" name="author">
 <meta content='
        This document specifies "dns-persist-01", a new validation method for the Automated Certificate Management Environment (ACME) protocol. This method allows a Certification Authority (CA) to verify control over a domain by confirming the presence of a persistent DNS TXT record containing CA and account identification information. This method is particularly suited for environments where traditional challenge methods are impractical, such as IoT deployments, multi-tenant platforms, and scenarios requiring batch certificate operations. The validation method is designed with a strong focus on security and robustness, incorporating widely adopted industry best practices for persistent domain control validation. This design aims to make it suitable for Certification Authorities operating under various policy environments, including those that align with the CA/Browser Forum Baseline Requirements. 
     ' name="description">
@@ -1051,7 +1052,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <td class="right">June 2025</td>
 </tr></thead>
 <tfoot><tr>
-<td class="left">Heurich &amp; Birge-Lee</td>
+<td class="left">Heurich, et al.</td>
 <td class="center">Expires 25 December 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
@@ -1080,6 +1081,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <div class="author">
       <div class="author-name">H. Birge-Lee</div>
 <div class="org">Princeton University</div>
+</div>
+<div class="author">
+      <div class="author-name">M. Slaughter</div>
+<div class="org">Amazon Trust Services</div>
 </div>
 </dd>
 </dl>
@@ -2044,6 +2049,10 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
+<dt id="birgelee-sc082-security">[birgelee-sc082-security]</dt>
+        <dd>
+<span class="refAuthor">Birge-Lee, H.</span>, <span class="refTitle">"Security of SC-082 Redux"</span>, <time datetime="2025" class="refDate">2025</time>. </dd>
+<dd class="break"></dd>
 <dt id="CABF-BR">[CABF-BR]</dt>
         <dd>
 <span class="refAuthor">CA/Browser Forum</span>, <span class="refTitle">"Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates"</span>, <time datetime="2024" class="refDate">2024</time>, <span>&lt;<a href="https://cabforum.org/baseline-requirements-documents/">https://cabforum.org/baseline-requirements-documents/</a>&gt;</span>. </dd>
@@ -2062,8 +2071,20 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">The author would like to acknowledge the CA/Browser Forum for developing the Baseline Requirements that motivated this specification, and the ACME Working Group for their ongoing work on certificate automation protocols.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2">Thanks to the contributors and reviewers who provided feedback on early versions of this document.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">The authors acknowledge prior community work that directly informed this specification:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-A-2.1">
+          <p id="appendix-A-2.1.1">The CA/Browser Forum ballot proposals to enable persistent / static DNS Domain Control Validation signals in the Baseline Requirements, in particular Ballot SC-082 ("Clarify CA Assisted DNS Validation under 3.2.2.4.7", authored by Michael Slaughter) and the active proposal SC-088 ("DNS TXT Record with Persistent Value DCV Method", GitHub PR #608, also authored by Michael Slaughter). These efforts provided the policy framing and initial industry discussion motivating standardization of a reusable ACME DNS validation record.<a href="#appendix-A-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.2">
+          <p id="appendix-A-2.2.1">The formal and empirical security analysis of static / persistent DCV methods performed by Henry Birge-Lee ("Proof of static DCV security" presentation, the "Security of SC-082 Redux" paper <span>[<a href="#birgelee-sc082-security" class="cite xref">birgelee-sc082-security</a>]</span>, and related research), which helped clarify the threat model and informed the security considerations in this document.<a href="#appendix-A-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-A-2.3">
+          <p id="appendix-A-2.3.1">The Delegated DNS Domain Validation (DDDV) Threat Modeling Tiger Team discussions and document ("Validation SC - Delegated DNS Domain Validation (DDDV) Threat Model"), whose participants contributed to broad threat enumeration; notable contributors include Michael Slaughter (Amazon Trust Services), Corey Bonnell (DigiCert), Clint Wilson (Apple), and Martijn Katerbarg (Sectigo).<a href="#appendix-A-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="appendix-A-3">The authors also thank members of the ACME Working Group and CA/Browser Forum who provided early review, critique, and operational perspectives on persistent validation records.<a href="#appendix-A-3" class="pilcrow">¶</a></p>
+<p id="appendix-A-4">Any errors or omissions are the responsibility of the authors.<a href="#appendix-A-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
@@ -2085,6 +2106,14 @@ _validation-persist.example.com. IN TXT "authority.example; accounturi=https://c
 <div class="email">
 <span>Email:</span>
 <a href="mailto:birgelee@princeton.edu" class="email">birgelee@princeton.edu</a>
+</div>
+</address>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Michael Slaughter</span></div>
+<div dir="auto" class="left"><span class="org">Amazon Trust Services</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:slghtr@amazon.com" class="email">slghtr@amazon.com</a>
 </div>
 </address>
 </section>
