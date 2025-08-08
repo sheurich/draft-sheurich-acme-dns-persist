@@ -5,10 +5,10 @@
 Automated Certificate Management Environment                  S. Heurich
 Internet-Draft                                                    Fastly
 Intended status: Standards Track                            H. Birge-Lee
-Expires: 25 December 2025                           Princeton University
+Expires: 9 February 2026                            Princeton University
                                                             M. Slaughter
                                                    Amazon Trust Services
-                                                            23 June 2025
+                                                           8 August 2025
 
 
    Automated Certificate Management Environment (ACME) Challenge for
@@ -63,7 +63,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 December 2025.
+   This Internet-Draft will expire on 9 February 2026.
 
 Copyright Notice
 
@@ -87,10 +87,15 @@ Table of Contents
    3.  The "dns-persist-01" Challenge
      3.1.  Challenge Object
    4.  Challenge Response and Verification
-     4.1.  Handling of Multiple Records
+     4.1.  Multiple Issuer Support
+       4.1.1.  Coexistence of Records
+       4.1.2.  CA Verification Process
+       4.1.3.  Security and Management Considerations
+       4.1.4.  Example: Authorizing Two CAs
      4.2.  Just-in-Time Validation
    5.  Wildcard Certificate Validation
    6.  Subdomain Certificate Validation
+     6.1.  Example: Scope of 'wildcard' Policy
    7.  Security Considerations
      7.1.  Persistent Record Risks
      7.2.  Account Binding Security
@@ -195,24 +200,24 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-   DNS TXT Record Persistent DCV Domain Label  The label "_validation-
+   *DNS TXT Record Persistent DCV Domain Label*  The label "_validation-
       persist" as specified in this document.  This label is consistent
       with industry practices for persistent domain validation.
 
-   Authorization Domain Name  The domain name at which the validation
+   *Authorization Domain Name*  The domain name at which the validation
       TXT record is provisioned.  It is formed by prepending the DNS TXT
       Record Persistent DCV Domain Label to the FQDN being validated.
 
-   Issuer Domain Name  A domain name disclosed by the CA in Section 4.2
-      of the CA's Certificate Policy and/or Certification Practices
-      Statement to identify the CA for the purposes of this validation
-      method.
+   *Issuer Domain Name*  A domain name disclosed by the CA in
+      Section 4.2 of the CA's Certificate Policy and/or Certification
+      Practices Statement to identify the CA for the purposes of this
+      validation method.
 
-   Validation Data Reuse Period  The period during which a CA may rely
+   *Validation Data Reuse Period*  The period during which a CA may rely
       on validation data, as defined by the CA's practices and
       applicable requirements.
 
-   persistUntil  An optional parameter in the validation record that
+   *persistUntil*  An optional parameter in the validation record that
       specifies the timestamp after which the validation record should
       no longer be considered valid by CAs.  The value MUST be a base-10
       encoded integer representing a UNIX timestamp (the number of
@@ -248,7 +253,7 @@ Table of Contents
    *  *issuer-domain-name* (required, string): The Issuer Domain Name
       that the client MUST include in the DNS TXT record
 
-   Example challenge object:
+   The following shows an example challenge object:
 
    {
      "type": "dns-persist-01",
@@ -256,6 +261,8 @@ Table of Contents
      "status": "pending",
      "issuer-domain-name": "authority.example"
    }
+
+             Figure 1: Example dns-persist-01 Challenge Object
 
 4.  Challenge Response and Verification
 
@@ -294,10 +301,10 @@ Table of Contents
       and for wildcard certificates (e.g., *.example.com).  See
       Section 5 and Section 6.
 
-   If the policy parameter is absent, or if its value is anything other
-   than wildcard, the CA MUST proceed as if the policy parameter were
-   not present (i.e., the validation applies only to the specific FQDN).
-   CAs MUST ignore any unknown parameter keys.
+  If the `policy` parameter is absent, or if its value is anything other
+  than `wildcard`, the CA MUST proceed as if the policy parameter were
+  not present (i.e., the validation applies only to the specific FQDN).
+  CAs MUST ignore any unknown parameter keys.
 
    1.  The issue-value MAY contain a persistUntil parameter.  If
        present, the value MUST be a base-10 encoded integer representing
@@ -312,7 +319,8 @@ Table of Contents
    Domain Name, and the client's account URI is "https://ca.example/
    acct/123", it might provision:
 
-   _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
+   _validation-persist.example.com. IN TXT ("authority.example;"
+   " accounturi=https://ca.example/acct/123")
 
    The ACME server verifies the challenge by performing a DNS lookup for
    TXT records at the Authorization Domain Name.  It then iterates
@@ -322,29 +330,104 @@ Table of Contents
    for detailed requirements.  The server also interprets any policy
    parameter values according to this specification.
 
-4.1.  Handling of Multiple Records
+4.1.  Multiple Issuer Support
 
-   A DNS query for the Authorization Domain Name may return multiple TXT
-   records.  When multiple records are present, a CA MUST iterate
-   through them to find one that meets the validation requirements.  The
-   validation is successful if at least one record satisfies all of the
-   following conditions:
+   A domain MAY authorize multiple Certificate Authorities (CAs) by
+   provisioning a separate _validation-persist TXT record for each
+   issuer.  This allows domain owners to maintain relationships with
+   multiple CAs simultaneously, enhancing flexibility and resilience.
 
-   1.  The record conforms to all requirements specified in this
-       document
+4.1.1.  Coexistence of Records
 
-   2.  The issuer-domain-name in the record matches the CA's Issuer
-       Domain Name
+   When multiple TXT records are present at the same DNS label (e.g.,
+   _validation-persist.example.com), each record functions as an
+   independent authorization for the specified issuer.  This follows a
+   similar pattern to CAA records [RFC8659], where multiple records at
+   the same label are permissible.
 
-   3.  The accounturi parameter exactly matches the URI of the ACME
-       account making the request
+4.1.2.  CA Verification Process
 
-   4.  Any persistUntil parameter, if present, has not expired
+   When a CA performs validation for a domain with multiple _validation-
+   persist TXT records, it MUST follow these steps:
 
-   Malformed records or records intended for other CAs MUST be ignored.
-   If no single record meets all requirements, the validation attempt
-   fails.  This approach allows multiple CAs to have persistent
-   validation records for the same domain simultaneously.
+   1.  *Query DNS*: Retrieve all TXT records from the Authorization
+       Domain Name.
+
+   2.  *Filter Records*: Iterate through the returned records and
+       identify the one where the issuer-domain-name value matches the
+       CA's own designated Issuer Domain Name.  All other records MUST
+       be ignored.
+
+   3.  *Validate Record*: If a matching record is found, the CA proceeds
+       to validate it according to the requirements in this
+       specification, including verifying the accounturi and
+       persistUntil parameters.
+
+   4.  *Handle No Match*: If no record with a matching issuer-domain-
+       name is found, the validation attempt MUST fail.
+
+4.1.3.  Security and Management Considerations
+
+   When authorizing multiple issuers, domain owners MUST consider the
+   following:
+
+   *Auditing*  Regularly audit DNS records to ensure that only intended
+      CAs remain authorized.  Remove records for CAs that are no longer
+      in use.
+
+   *Independent Security*  Each authorized CA operates independently.
+      The compromise of one CA's systems does not directly affect the
+      security of other authorized CAs.
+
+   *Weakest Link*  The domain's overall security posture is influenced
+      by the security practices of all authorized CAs.  Domain owners
+      should consider the practices of each CA they authorize.
+
+   *Authorization Removal*  To de-authorize a CA, the corresponding TXT
+      record MUST be deleted from the DNS zone.
+
+4.1.4.  Example: Authorizing Two CAs
+
+   This example demonstrates how a domain owner can authorize two
+   different CAs, "ca1.example" and "ca2.example", to issue certificates
+   for example.org.
+
+   *DNS Configuration:*
+
+   _validation-persist.example.org. 3600 IN TXT ("ca1.example;"
+   " accounturi=https://ca1.example/acme/acct/12345;"
+   " policy=wildcard")
+   _validation-persist.example.org. 3600 IN TXT ("ca2.example;"
+   " accounturi=https://ca2.example/acme/acct/67890;"
+   " persistUntil=1767225600")
+
+   *Verification Flow for CA1:*
+
+   1.  CA1 queries for TXT records at _validation-persist.example.org.
+
+   2.  It receives both records.
+
+   3.  It filters for the record where issuer-domain-name is
+       "ca1.example".
+
+   4.  It validates the request using this record, noting the
+       policy=wildcard authorization.
+
+   5.  The second record for "ca2.example" is ignored.
+
+   *Verification Flow for CA2:*
+
+   1.  CA2 queries for TXT records at _validation-persist.example.org.
+
+   2.  It receives both records.
+
+   3.  It filters for the record where issuer-domain-name is
+       "ca2.example".
+
+   4.  It validates the request using this record, noting the
+       persistUntil constraint.
+
+   5.  The first record for "ca1.example" is ignored.
 
 4.2.  Just-in-Time Validation
 
@@ -393,13 +476,13 @@ Table of Contents
 
    *  The persistent DNS TXT record MUST include policy=wildcard.
 
-   To determine which subdomains are permitted, the FQDN for which the
-   persistent TXT record exists (referred to as the "validated FQDN")
-   must appear as the exact suffix of the FQDN for which a certificate
-   is requested (referred to as the "requested FQDN").  For example, if
-   dept.example.com is the validated FQDN, a certificate for
-   server.dept.example.com is permitted because dept.example.com is its
-   suffix.
+      To determine which subdomains are permitted, the FQDN for which
+      the persistent TXT record exists (referred to as the "validated
+      FQDN") must appear as the exact suffix of the FQDN for which a
+      certificate is requested (referred to as the "requested FQDN").
+      For example, if dept.example.com is the validated FQDN, a
+      certificate for server.dept.example.com is permitted because
+      dept.example.com is its suffix.
 
    When policy=wildcard is present, the validation authorizes
    certificates for the _validated FQDN itself_, for _any specific
@@ -417,7 +500,7 @@ Table of Contents
    See Section 7.3 for important security implications of enabling
    subdomain validation.
 
-   Example: Scope of 'wildcard' Policy
+6.1.  Example: Scope of 'wildcard' Policy
 
    For a persistent TXT record provisioned at _validation-
    persist.example.com with a policy of wildcard, a CA may issue
@@ -778,19 +861,20 @@ Table of Contents
 
    1.  CA provides challenge object:
 
-   {
-     "type": "dns-persist-01",
-     "url": "https://ca.example/acme/authz/1234/0",
-     "status": "pending",
-     "issuer-domain-name": "authority.example"
-   }
+      {
+        "type": "dns-persist-01",
+        "url": "https://ca.example/acme/authz/1234/0",
+        "status": "pending",
+        "issuer-domain-name": "authority.example"
+      }
 
-   1.  Client provisions DNS TXT record (note the absence of a policy
+   2.  Client provisions DNS TXT record (note the absence of a policy
        parameter for scope):
 
-   _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
+      _validation-persist.example.com. IN TXT ("authority.example;"
+      " accounturi=https://ca.example/acct/123")
 
-   1.  CA validates the record through DNS queries.  This validation is
+   3.  CA validates the record through DNS queries.  This validation is
        sufficient only for "example.com".
 
 10.2.  Wildcard Validation Example
@@ -804,9 +888,11 @@ Table of Contents
    2.  Client provisions DNS TXT record at the base domain's
        Authorization Domain Name, including policy=wildcard:
 
-   _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard"
+      _validation-persist.example.com. IN TXT ("authority.example;"
+      " accounturi=https://ca.example/acct/123;"
+      " policy=wildcard")
 
-   1.  CA validates the record through DNS queries.  This validation
+   3.  CA validates the record through DNS queries.  This validation
        authorizes certificates for "example.com", "*.example.com", and
        specific subdomains like "www.example.com".
 
@@ -818,9 +904,11 @@ Table of Contents
 
    2.  Client provisions DNS TXT record including persistUntil:
 
-   _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; persistUntil=1721952000"
+      _validation-persist.example.com. IN TXT ("authority.example;"
+      " accounturi=https://ca.example/acct/123;"
+      " persistUntil=1721952000")
 
-   1.  CA validates the record.  This validation is sufficient only for
+   3.  CA validates the record.  This validation is sufficient only for
        "example.com" and will not be considered valid after the
        specified timestamp (2024-07-26T00:00:00Z).
 
@@ -833,9 +921,12 @@ Table of Contents
    2.  Client provisions DNS TXT record including policy=wildcard and
        persistUntil:
 
-   _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard; persistUntil=1721952000"
+      _validation-persist.example.com. IN TXT ("authority.example;"
+      " accounturi=https://ca.example/acct/123;"
+      " policy=wildcard;"
+      " persistUntil=1721952000")
 
-   1.  CA validates the record.  This validation authorizes certificates
+   3.  CA validates the record.  This validation authorizes certificates
        for "example.com", "*.example.com", and specific subdomains, but
        will not be considered valid after the specified timestamp
        (2024-07-26T00:00:00Z).
@@ -873,10 +964,6 @@ Table of Contents
 
    [birgelee-sc082-security]
               Birge-Lee, H., "Security of SC-082 Redux", 2025.
-
-   [CABF-BR]  CA/Browser Forum, "Baseline Requirements for the Issuance
-              and Management of Publicly-Trusted Certificates", 2024,
-              <https://cabforum.org/baseline-requirements-documents/>.
 
    [draft-sheth-identifiers-dns]
               Sheth, S. and A. Kaizer, "Best Practices for Persistent
