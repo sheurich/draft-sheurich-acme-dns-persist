@@ -36,12 +36,6 @@ author:
    email: "slghtr@amazon.com"
 
 informative:
-  CABF-BR:
-    title: "Baseline Requirements for the Issuance and Management of Publicly-Trusted Certificates"
-    author:
-      org: "CA/Browser Forum"
-    date: 2024
-    target: "https://cabforum.org/baseline-requirements-documents/"
   draft-sheth-identifiers-dns:
     target: https://datatracker.ietf.org/doc/draft-sheth-identifiers-dns/
     title: "Best Practices for Persistent References in DNS"
@@ -163,14 +157,18 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
    - `policy=wildcard`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
 
-    If the `policy` parameter is absent, or if its value is anything other than `wildcard`, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN). CAs MUST ignore any unknown parameter keys.
+    If the `policy` parameter is absent, or if its value is anything other
+    than `wildcard`, the CA MUST proceed as if the policy parameter were
+    not present (i.e., the validation applies only to the specific FQDN).
+    CAs MUST ignore any unknown parameter keys.
 
 5.  The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing a UNIX timestamp (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds). CAs MUST NOT consider this validation record valid for new validation attempts after the specified timestamp. However, this does not affect the reuse of already-validated data.
 
 For example, if the ACME client is requesting validation for the FQDN "example.com" from a CA that uses "authority.example" as its Issuer Domain Name, and the client's account URI is "https://ca.example/acct/123", it might provision:
 
 ~~~ dns
-_validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
+_validation-persist.example.com. IN TXT ("authority.example;"
+" accounturi=https://ca.example/acct/123")
 ~~~
 
 The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. See {{multiple-issuer-support}} for detailed requirements. The server also interprets any `policy` parameter values according to this specification.
@@ -215,8 +213,12 @@ This example demonstrates how a domain owner can authorize two different CAs, "c
 **DNS Configuration:**
 
 ~~~dns
-_validation-persist.example.org. 3600 IN TXT "ca1.example; accounturi=https://ca1.example/acme/acct/12345; policy=wildcard"
-_validation-persist.example.org. 3600 IN TXT "ca2.example; accounturi=https://ca2.example/acme/acct/67890; persistUntil=1767225600"
+_validation-persist.example.org. 3600 IN TXT ("ca1.example;"
+" accounturi=https://ca1.example/acme/acct/12345;"
+" policy=wildcard")
+_validation-persist.example.org. 3600 IN TXT ("ca2.example;"
+" accounturi=https://ca2.example/acme/acct/67890;"
+" persistUntil=1767225600")
 ~~~
 
 **Verification Flow for CA1:**
@@ -461,7 +463,8 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 2.  Client provisions DNS TXT record (note the absence of a `policy` parameter for scope):
 
     ~~~ dns
-    _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
+    _validation-persist.example.com. IN TXT ("authority.example;"
+    " accounturi=https://ca.example/acct/123")
     ~~~
 
 3.  CA validates the record through DNS queries. This validation is sufficient only for "example.com".
@@ -476,7 +479,9 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 2.  Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard`:
 
     ~~~ dns
-    _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard"
+    _validation-persist.example.com. IN TXT ("authority.example;"
+    " accounturi=https://ca.example/acct/123;"
+    " policy=wildcard")
     ~~~
 
 3.  CA validates the record through DNS queries. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains like "www.example.com".
@@ -490,7 +495,9 @@ For validation of "example.com" with an explicit expiration date:
 2.  Client provisions DNS TXT record including `persistUntil`:
 
     ~~~ dns
-    _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; persistUntil=1721952000"
+    _validation-persist.example.com. IN TXT ("authority.example;"
+    " accounturi=https://ca.example/acct/123;"
+    " persistUntil=1721952000")
     ~~~
 
 3.  CA validates the record. This validation is sufficient only for "example.com" and will not be considered valid after the specified timestamp (2024-07-26T00:00:00Z).
@@ -504,7 +511,10 @@ For validation of "*.example.com" with an explicit expiration date:
 2.  Client provisions DNS TXT record including `policy=wildcard` and `persistUntil`:
 
     ~~~ dns
-    _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123; policy=wildcard; persistUntil=1721952000"
+    _validation-persist.example.com. IN TXT ("authority.example;"
+    " accounturi=https://ca.example/acct/123;"
+    " policy=wildcard;"
+    " persistUntil=1721952000")
     ~~~
 
 3.  CA validates the record. This validation authorizes certificates for "example.com", "*.example.com", and specific subdomains, but will not be considered valid after the specified timestamp (2024-07-26T00:00:00Z).
