@@ -48,12 +48,12 @@ informative:
     author:
       -
         ins: S. Sheth
-        name: S. Sheth
-        org: Verisign Labs
+        name: Swapneel Sheth
+        org: "Verisign Labs"
       -
         ins: A. Kaizer
-        name: A. Kaizer
-        org: Verisign Labs
+        name: Andrew Kaizer
+        org: "Verisign Labs"
     date: 2025-04-22
   birgelee-sc082-security:
     title: "Security of SC-082 Redux"
@@ -61,6 +61,7 @@ informative:
       -
         ins: H. Birge-Lee
         name: Henry Birge-Lee
+        org: "Princeton University"
     date: 2025
 
 
