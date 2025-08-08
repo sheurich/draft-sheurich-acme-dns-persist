@@ -125,7 +125,15 @@ The challenge object for "dns-persist-01" contains the following fields:
 - **type** (required, string): The string "dns-persist-01"
 - **url** (required, string): The URL to which a response can be posted
 - **status** (required, string): The status of this challenge
-- **issuer-domain-name** (required, string): The Issuer Domain Name that the client MUST include in the DNS TXT record
+- **issuer-domain-names** (required, array of strings): A list of one or more Issuer Domain Names. The client MUST choose one of these domain names to include in the DNS TXT record. The challenge is successful if a valid TXT record is found that uses any one of the provided domain names.
+
+  Each string in the array MUST be a domain name that complies with the following normalization rules:
+
+  1.  The domain name MUST be represented in A-label format (Punycode, {{!RFC5890}}).
+  2.  All characters MUST be lowercase.
+  3.  The domain name MUST NOT have a trailing dot.
+
+  The server MUST ensure the array is not empty. Servers MUST NOT send more than 10 issuer domain names. Clients MUST consider a challenge malformed if the `issuer-domain-names` array is empty, and MAY reject a list with more than 10 entries as malformed. Each domain name MUST NOT exceed 253 octets in length.
 
 The following shows an example challenge object:
 
@@ -134,7 +142,7 @@ The following shows an example challenge object:
   "type": "dns-persist-01",
   "url": "https://ca.example/acme/authz/1234/0",
   "status": "pending",
-  "issuer-domain-name": "authority.example"
+  "issuer-domain-names": ["authority.example", "ca.example.net"]
 }
 ~~~
 {: #fig-challenge-object title="Example dns-persist-01 Challenge Object"}
@@ -149,7 +157,7 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 1.  The RDATA value MUST conform to the issue-value syntax as defined in {{!RFC8659}}, Section 4.
 
-2.  The `issuer-domain-name` portion of the issue-value MUST be the Issuer Domain Name provided by the CA in the challenge object.
+2.  The `issuer-domain-name` portion of the issue-value MUST be one of the Issuer Domain Names provided by the CA in the `issuer-domain-names` array of the challenge object.
 
 3.  The issue-value MUST contain an accounturi parameter. The value of this parameter MUST be a unique URI identifying the account of the applicant which requested the validation, constructed according to {{!RFC8657}}, Section 3.
 
@@ -171,7 +179,7 @@ _validation-persist.example.com. IN TXT ("authority.example;"
 " accounturi=https://ca.example/acct/123")
 ~~~
 
-The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. See {{multiple-issuer-support}} for detailed requirements. The server also interprets any `policy` parameter values according to this specification.
+The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure. For a record to be considered valid, its `issuer-domain-name` value MUST match one of the values provided in the `issuer-domain-names` array from the challenge object, and it must contain a valid `accounturi` for the requesting account. When comparing issuer domain names, the server MUST adhere to the normalization rules specified in {{challenge-object}}. The server also interprets any `policy` parameter values according to this specification.
 
 ## Multiple Issuer Support {#multiple-issuer-support}
 
@@ -186,7 +194,7 @@ When multiple TXT records are present at the same DNS label (e.g., `_validation-
 When a CA performs validation for a domain with multiple `_validation-persist` TXT records, it MUST follow these steps:
 
 1.  **Query DNS**: Retrieve all TXT records from the Authorization Domain Name.
-2.  **Filter Records**: Iterate through the returned records and identify the one where the `issuer-domain-name` value matches the CA's own designated Issuer Domain Name. All other records MUST be ignored.
+2.  **Filter Records**: Iterate through the returned records to find one where the `issuer-domain-name` value matches one of the Issuer Domain Names the CA is configured to use for this validation. The CA MUST ignore all other records.
 3.  **Validate Record**: If a matching record is found, the CA proceeds to validate it according to the requirements in this specification, including verifying the `accounturi` and `persistUntil` parameters.
 4.  **Handle No Match**: If no record with a matching `issuer-domain-name` is found, the validation attempt MUST fail.
 
@@ -333,6 +341,12 @@ DNS records are generally not authenticated end-to-end, making them potentially 
 
 Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures. Using DNSSEC is a recommended mechanism for this purpose. An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
 
+## Issuer Domain Name Normalization and Limits
+
+The `issuer-domain-names` field requires domain names to be provided in a normalized form (lowercase A-labels, no trailing dot) to prevent errors and security issues arising from case-sensitivity differences or Unicode homograph attacks. By requiring a canonical representation, servers and clients can perform simple byte-for-byte comparisons, ensuring interoperability and deterministic validation. The order of names in the array has no significance.
+
+The server-side limit on the number of issuer domain names provided in a single challenge (e.g., 10) helps mitigate denial-of-service vectors where a client might be forced to perform an excessive number of DNS queries or a server might be burdened by validating against a large set of domains.
+
 ## DNS Security Measures {#dns-security-measures}
 
 To enhance the security and integrity of the validation process, CAs and clients should consider implementing advanced DNS security measures.
@@ -420,7 +434,7 @@ When implementing the "dns-persist-01" validation method, Certificate Authoritie
 - CAs SHOULD return an `unauthorized` error (as defined in {{!RFC8555}}) when validation fails due to authorization issues, including:
    - The `accounturi` parameter in the DNS TXT record does not match the URI of the ACME account making the request
    - The `persistUntil` timestamp has expired, indicating that the validation record is no longer considered valid for new validation attempts
-   - The `issuer-domain-name` in the DNS TXT record does not match the CA's Issuer Domain Name
+   - The `issuer-domain-name` in the DNS TXT record does not match any of the values provided in the `issuer-domain-names` array of the challenge object
 
 These error codes help ACME clients distinguish between different types of validation failures and take appropriate corrective actions.
 
@@ -449,18 +463,18 @@ DNS providers supporting this validation method should consider:
 
 For validation of "example.com" by a CA using "authority.example" as its Issuer Domain Name, where the validation should only apply to "example.com":
 
-1.  CA provides challenge object:
+1.  CA provides challenge object with a list of valid Issuer Domain Names:
 
     ~~~json
     {
       "type": "dns-persist-01",
       "url": "https://ca.example/acme/authz/1234/0",
       "status": "pending",
-      "issuer-domain-name": "authority.example"
+      "issuer-domain-names": ["authority.example", "ca.example.net"]
     }
     ~~~
 
-2.  Client provisions DNS TXT record (note the absence of a `policy` parameter for scope):
+2.  Client chooses one of the provided Issuer Domain Names (e.g., "authority.example") and provisions a DNS TXT record (note the absence of a `policy` parameter for scope):
 
     ~~~ dns
     _validation-persist.example.com. IN TXT ("authority.example;"
@@ -474,9 +488,9 @@ For validation of "example.com" by a CA using "authority.example" as its Issuer 
 
 For validation of "*.example.com" (which also validates "example.com" and specific subdomains like "www.example.com") by a CA using "authority.example" as its Issuer Domain Name:
 
-1.  Same challenge object format as above.
+1.  The CA provides a challenge object similar to the basic example, containing an `issuer-domain-names` array.
 
-2.  Client provisions DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard`:
+2.  Client chooses one of the provided Issuer Domain Names (e.g., "authority.example") and provisions a DNS TXT record at the base domain's Authorization Domain Name, including `policy=wildcard`:
 
     ~~~ dns
     _validation-persist.example.com. IN TXT ("authority.example;"
@@ -490,9 +504,9 @@ For validation of "*.example.com" (which also validates "example.com" and specif
 
 For validation of "example.com" with an explicit expiration date:
 
-1.  Same challenge object format as above.
+1.  The CA provides a challenge object similar to the basic example, containing an `issuer-domain-names` array.
 
-2.  Client provisions DNS TXT record including `persistUntil`:
+2.  Client chooses one of the provided Issuer Domain Names (e.g., "authority.example") and provisions a DNS TXT record including `persistUntil`:
 
     ~~~ dns
     _validation-persist.example.com. IN TXT ("authority.example;"
@@ -506,9 +520,9 @@ For validation of "example.com" with an explicit expiration date:
 
 For validation of "*.example.com" with an explicit expiration date:
 
-1.  Same challenge object format as above.
+1.  The CA provides a challenge object similar to the basic example, containing an `issuer-domain-names` array.
 
-2.  Client provisions DNS TXT record including `policy=wildcard` and `persistUntil`:
+2.  Client chooses one of the provided Issuer Domain Names (e.g., "authority.example") and provisions a DNS TXT record including `policy=wildcard` and `persistUntil`:
 
     ~~~ dns
     _validation-persist.example.com. IN TXT ("authority.example;"
