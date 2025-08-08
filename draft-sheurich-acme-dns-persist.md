@@ -4,7 +4,7 @@ abbrev: "ACME Persistent DNS Challenge"
 category: std
 docname: draft-sheurich-acme-dns-persist-latest
 number:
-date: 2025-06-23
+date: 2025-08-08
 v: 3
 area: "Security"
 workgroup: "Automated Certificate Management Environment"
