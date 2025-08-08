@@ -171,24 +171,66 @@ For example, if the ACME client is requesting validation for the FQDN "example.c
 _validation-persist.example.com. IN TXT "authority.example; accounturi=https://ca.example/acct/123"
 ~~~
 
-The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. See {{handling-of-multiple-records}} for detailed requirements. The server also interprets any `policy` parameter values according to this specification.
+The ACME server verifies the challenge by performing a DNS lookup for TXT records at the Authorization Domain Name. It then iterates through the returned records to find one that conforms to the required structure and contains both the correct `issuer-domain-name` and a valid `accounturi` for the requesting account. See {{multiple-issuer-support}} for detailed requirements. The server also interprets any `policy` parameter values according to this specification.
 
-## Handling of Multiple Records {#handling-of-multiple-records}
+## Multiple Issuer Support {#multiple-issuer-support}
 
-A DNS query for the Authorization Domain Name may return multiple TXT records. When multiple records are present, a CA MUST iterate through them to find one that meets the validation requirements. The validation is successful if at least one record satisfies all of the following conditions:
+A domain MAY authorize multiple Certificate Authorities (CAs) by provisioning a separate `_validation-persist` TXT record for each issuer. This allows domain owners to maintain relationships with multiple CAs simultaneously, enhancing flexibility and resilience.
 
-1. The record conforms to all requirements specified in this document
-2. The `issuer-domain-name` in the record matches the CA's Issuer Domain Name
-3. The `accounturi` parameter exactly matches the URI of the ACME account making the request
-4. Any `persistUntil` parameter, if present, has not expired
+### Coexistence of Records
 
-Malformed records or records intended for other CAs MUST be ignored. If no single record meets all requirements, the validation attempt fails. This approach allows multiple CAs to have persistent validation records for the same domain simultaneously.
+When multiple TXT records are present at the same DNS label (e.g., `_validation-persist.example.com`), each record functions as an independent authorization for the specified issuer. This follows a similar pattern to CAA records {{!RFC8659}}, where multiple records at the same label are permissible.
+
+### CA Verification Process
+
+When a CA performs validation for a domain with multiple `_validation-persist` TXT records, it MUST follow these steps:
+
+1.  **Query DNS**: Retrieve all TXT records from the Authorization Domain Name.
+2.  **Filter Records**: Iterate through the returned records and identify the one where the `issuer-domain-name` value matches the CA's own designated Issuer Domain Name. All other records MUST be ignored.
+3.  **Validate Record**: If a matching record is found, the CA proceeds to validate it according to the requirements in this specification, including verifying the `accounturi` and `persistUntil` parameters.
+4.  **Handle No Match**: If no record with a matching `issuer-domain-name` is found, the validation attempt MUST fail.
+
+### Security and Management Considerations
+
+When authorizing multiple issuers, domain owners MUST consider the following:
+
+*   **Auditing**: Regularly audit DNS records to ensure that only intended CAs remain authorized. Remove records for CAs that are no longer in use.
+*   **Independent Security**: Each authorized CA operates independently. The compromise of one CA's systems does not directly affect the security of other authorized CAs.
+*   **Weakest Link**: The domain's overall security posture is influenced by the security practices of all authorized CAs. Domain owners should consider the practices of each CA they authorize.
+*   **Authorization Removal**: To de-authorize a CA, the corresponding TXT record MUST be deleted from the DNS zone.
+
+### Example: Authorizing Two CAs
+
+This example demonstrates how a domain owner can authorize two different CAs, "ca1.example" and "ca2.example", to issue certificates for `example.org`.
+
+**DNS Configuration:**
+
+~~~dns
+_validation-persist.example.org. 3600 IN TXT "ca1.example; accounturi=https://ca1.example/acme/acct/12345; policy=wildcard"
+_validation-persist.example.org. 3600 IN TXT "ca2.example; accounturi=https://ca2.example/acme/acct/67890; persistUntil=1767225600"
+~~~
+
+**Verification Flow for CA1:**
+
+1.  CA1 queries for TXT records at `_validation-persist.example.org`.
+2.  It receives both records.
+3.  It filters for the record where `issuer-domain-name` is "ca1.example".
+4.  It validates the request using this record, noting the `policy=wildcard` authorization.
+5.  The second record for "ca2.example" is ignored.
+
+**Verification Flow for CA2:**
+
+1.  CA2 queries for TXT records at `_validation-persist.example.org`.
+2.  It receives both records.
+3.  It filters for the record where `issuer-domain-name` is "ca2.example".
+4.  It validates the request using this record, noting the `persistUntil` constraint.
+5.  The first record for "ca1.example" is ignored.
 
 ## Just-in-Time Validation {#just-in-time-validation}
 
 When processing a new authorization request, a CA MAY perform an immediate DNS lookup for `_validation-persist` TXT records at the Authorization Domain Name corresponding to the requested domain identifier.
 
-If one or more such records exist, the CA MUST evaluate them according to the requirements specified in {{handling-of-multiple-records}}. If at least one record meets all validation requirements, the CA MAY transition the authorization directly to the "valid" status without requiring a challenge response.
+If one or more such records exist, the CA MUST evaluate them according to the requirements specified in {{multiple-issuer-support}}. If at least one record meets all validation requirements, the CA MAY transition the authorization directly to the "valid" status without requiring a challenge response.
 
 If no DNS TXT record meets the validation requirements, or if the records are absent, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
 
