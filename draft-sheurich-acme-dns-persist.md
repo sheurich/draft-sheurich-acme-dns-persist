@@ -450,6 +450,29 @@ The RDATA of the TXT record, which contains the `issue-value`, may become large,
 
 Failure to correctly format long RDATA values may result in validation failures.
 
+### Domain Name Normalization Algorithm
+
+This section provides a non-normative algorithm for domain name normalization to promote interoperability. Both clients and servers SHOULD follow a consistent normalization process to ensure that domain names are handled uniformly.
+
+The recommended normalization process consists of the following four steps, applied in order:
+
+1.  **Case-folding**: Apply Unicode-aware, locale-independent case-folding to the entire domain name string to convert it to lowercase.
+2.  **Unicode Normalization**: Normalize the string to Unicode Normalization Form C (NFC).
+3.  **Punycode Conversion**: Convert each label of the domain name to its A-label (Punycode) representation as specified in {{!RFC5890}}.
+4.  **Trailing Dot Removal**: Remove any trailing dot from the final string.
+
+For example, a domain name like `EXAMPLE.com.` is normalized as follows:
+1. After case-folding: `example.com.`
+2. After NFC normalization: `example.com.`
+3. After Punycode conversion: `example.com.`
+4. After removing trailing dot: `example.com`
+
+An internationalized domain name like `üÑICODE-example.com.` is normalized as follows:
+1. After case-folding: `ünicode-example.com.`
+2. After NFC normalization: `ünicode-example.com.`
+3. After Punycode conversion: `xn--nicode-example-9jb.com.`
+4. After removing trailing dot: `xn--nicode-example-9jb.com`
+
 ## CA Implementation Guidelines {#ca-implementation-guidelines}
 
 Certificate Authorities implementing this validation method should consider:
