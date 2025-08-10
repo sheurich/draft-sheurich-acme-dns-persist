@@ -110,7 +110,7 @@ Certification Authorities operating under various trust program requirements wil
 :   The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
 **persistUntil**
-:   An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value MUST be a base-10 encoded integer representing a UNIX timestamp (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds).
+:   An optional parameter in the validation record that specifies the timestamp after which the validation record should no longer be considered valid by CAs. The value MUST be a base-10 encoded integer representing a UNIX timestamp in UTC (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds).
 
 # The "dns-persist-01" Challenge {#dns-persist-01-challenge}
 
@@ -133,7 +133,7 @@ The challenge object for "dns-persist-01" contains the following fields:
   2.  All characters MUST be lowercase.
   3.  The domain name MUST NOT have a trailing dot.
 
-  The server MUST ensure the array is not empty. Servers MUST NOT send more than 10 issuer domain names. Clients MUST consider a challenge malformed if the `issuer-domain-names` array is empty, and MAY reject a list with more than 10 entries as malformed. Each domain name MUST NOT exceed 253 octets in length.
+  The server MUST ensure the array is not empty. Servers MUST NOT send more than 10 issuer domain names. This limit serves as a practical measure to prevent denial-of-service vectors against clients. Clients MUST consider a challenge malformed if the `issuer-domain-names` array is empty or if it contains more than 10 entries, and MUST reject such challenges. Each domain name MUST NOT exceed 253 octets in length.
 
 The following shows an example challenge object:
 
@@ -161,14 +161,11 @@ The RDATA of this TXT record MUST fulfill the following requirements:
 
 3.  The issue-value MUST contain an accounturi parameter. The value of this parameter MUST be a unique URI identifying the account of the applicant which requested the validation, constructed according to {{!RFC8657}}, Section 3.
 
-4.  The issue-value MAY contain a `policy` parameter. If present, this parameter modifies the validation scope. The `policy` parameter follows the `key=value` syntax. The policy parameter key and its defined values MUST be treated as case-insensitive. The following value for the `policy` parameter is defined with respect to subdomain and wildcard validation:
+4.  The issue-value MAY contain a `policy` parameter. If present, this parameter modifies the validation scope. The `policy` parameter follows the `key=value` syntax. The policy parameter key and its defined values MUST be treated as case-insensitive. CAs MUST ignore any unknown parameter keys. The following value for the `policy` parameter is defined with respect to subdomain and wildcard validation:
 
-   - `policy=wildcard`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
+    - `policy=wildcard`: If this value is present, the CA MAY consider this validation sufficient for issuing certificates for the validated FQDN, for specific subdomains of the validated FQDN (as covered by wildcard scope or specific subdomain validation rules), and for wildcard certificates (e.g., `*.example.com`). See {{wildcard-certificate-validation}} and {{subdomain-certificate-validation}}.
 
-    If the `policy` parameter is absent, or if its value is anything other
-    than `wildcard`, the CA MUST proceed as if the policy parameter were
-    not present (i.e., the validation applies only to the specific FQDN).
-    CAs MUST ignore any unknown parameter keys.
+    If the `policy` parameter is absent, or if its value is anything other than `wildcard`, the CA MUST proceed as if the policy parameter were not present (i.e., the validation applies only to the specific FQDN).
 
 5.  The issue-value MAY contain a `persistUntil` parameter. If present, the value MUST be a base-10 encoded integer representing a UNIX timestamp (the number of seconds since 1970-01-01T00:00:00Z ignoring leap seconds). CAs MUST NOT consider this validation record valid for new validation attempts after the specified timestamp. However, this does not affect the reuse of already-validated data.
 
@@ -249,7 +246,7 @@ _validation-persist.example.org. 3600 IN TXT ("ca2.example;"
 
 When processing a new authorization request, a CA MAY perform an immediate DNS lookup for `_validation-persist` TXT records at the Authorization Domain Name corresponding to the requested domain identifier.
 
-If one or more such records exist, the CA MUST evaluate them according to the requirements specified in {{multiple-issuer-support}}. If at least one record meets all validation requirements, the CA MAY transition the authorization directly to the "valid" status without requiring a challenge response.
+If one or more such records exist, the CA MUST evaluate them according to the requirements specified in {{multiple-issuer-support}}. If at least one record meets all validation requirements, the CA MAY transition the authorization to the "valid" status without returning a "pending" challenge to the client. This mechanism is an optimization and does not alter the ACME state machine defined in {{!RFC8555}}. The server internally transitions the authorization from "pending" through "processing" to "valid" instantaneously. From the client's perspective, it receives a "valid" authorization object directly in response to its creation request.
 
 If no DNS TXT record meets the validation requirements, or if the records are absent, the CA MUST proceed with the standard authorization flow by returning a "pending" authorization with an associated `dns-persist-01` challenge object.
 
@@ -257,7 +254,7 @@ This mechanism enables efficient reuse of persistent validation records while ma
 
 # Wildcard Certificate Validation {#wildcard-certificate-validation}
 
-This validation method is suitable for validating Wildcard Domain Names (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard` parameter value.
+This validation method is suitable for validating wildcard certificates (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard` parameter value.
 
 When such a record is present (i.e., containing `policy=wildcard`), it can validate the base domain, specific subdomains, and wildcard certificates for that domain. For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard` can validate certificates for `example.com`, `www.example.com`, and `*.example.com`. If the `policy` parameter is absent, the validation is not sufficient for `*.example.com`.
 
@@ -385,7 +382,9 @@ The `persistUntil` parameter provides domain owners with direct control over the
 
 The persistent nature of `dns-persist-01` authorizations means that a valid DNS TXT record can grant control for an extended period, potentially even if the domain owner's intent changes or if the associated ACME account key is compromised. Therefore, explicit mechanisms for revoking or invalidating these persistent authorizations are critical.
 
-The primary method for an Applicant to invalidate a `dns-persist-01` authorization for a domain is to **remove the corresponding DNS TXT record** from the Authorization Domain Name. After the record is removed, new validation attempts for the domain will fail. Any existing authorization obtained via this method will remain valid until it expires as per the CA's Validation Data Reuse Period.
+The primary method for an Applicant to invalidate a `dns-persist-01` authorization for a domain is to **remove the corresponding DNS TXT record** from the Authorization Domain Name. After the record is removed, new validation attempts for the domain will fail. This behavior represents a deliberate design trade-off: any existing authorization obtained via this method will remain valid until it expires as per the CA's Validation Data Reuse Period. This persistence underscores the importance of protecting the ACME account key.
+
+For situations requiring immediate revocation of issuance capability, such as a suspected account key compromise, the primary and most effective mechanism is to **deactivate the ACME account** as specified in {{!RFC8555}}, Section 7.5.2. Deactivating the account immediately and irrevocably prevents it from being used for any further certificate issuance.
 
 ACME Clients SHOULD provide clear mechanisms for users to:
 
@@ -415,6 +414,23 @@ IANA is requested to register the following entry in the "ACME Validation Method
 - **Reference**: This document
 
 # Implementation Considerations {#implementation-considerations}
+
+## DNS Record Size Considerations
+
+The RDATA of the TXT record, which contains the `issue-value`, may become large, particularly if the `accounturi` is long. While the total size of a TXT record's RDATA can be up to 65,535 octets, it must be formatted as a sequence of one or more character-strings, where each string is limited to 255 octets in length.
+
+**CA Implementation Guidelines:**
+- CAs SHOULD endeavor to keep the `accounturi` values they generate reasonably concise to minimize the final record size.
+
+**Client Implementation Guidelines:**
+- Clients MUST properly handle the creation of TXT records where the RDATA exceeds 255 octets. As specified in {{!RFC1035}}, Section 3.3, clients MUST split the RDATA into multiple, concatenated, quote-enclosed strings, each no more than 255 octets. For example:
+
+  ~~~ dns
+  _validation-persist.example.com. IN TXT ("first-part-of-long-string..."
+  " ...second-part-of-long-string")
+  ~~~
+
+Failure to correctly format long RDATA values may result in validation failures.
 
 ## CA Implementation Guidelines {#ca-implementation-guidelines}
 
