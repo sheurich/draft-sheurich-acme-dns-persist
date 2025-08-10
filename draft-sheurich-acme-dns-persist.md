@@ -106,6 +106,8 @@ Certification Authorities operating under various trust program requirements wil
 **Issuer Domain Name**
 :   A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
 
+    Note: The `issuer-domain-names` provided in the challenge object SHOULD be drawn from the machine-readable `caaIdentities` array in the ACME server's directory object, as specified in {{!RFC8555}}, Section 9.7.6. This creates a clearer programmatic link between the server's advertised identities and the challenge object.
+
 **Validation Data Reuse Period**
 :   The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
 
@@ -252,29 +254,45 @@ If no DNS TXT record meets the validation requirements, or if the records are ab
 
 This mechanism enables efficient reuse of persistent validation records while maintaining the security properties of the validation method.
 
-# Wildcard Certificate Validation {#wildcard-certificate-validation}
+# Wildcard and Subdomain Certificate Validation {#wildcard-certificate-validation}
 
-This validation method is suitable for validating wildcard certificates (e.g., *.example.com). To authorize a wildcard certificate for a domain, a single DNS TXT record placed at the Authorization Domain Name for the base domain MUST be used. This TXT record MUST include the `policy=wildcard` parameter value.
+This validation method supports validation for wildcard certificates (e.g., *.example.com) and specific subdomains through the use of the `policy=wildcard` parameter.
 
-When such a record is present (i.e., containing `policy=wildcard`), it can validate the base domain, specific subdomains, and wildcard certificates for that domain. For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard` can validate certificates for `example.com`, `www.example.com`, and `*.example.com`. If the `policy` parameter is absent, the validation is not sufficient for `*.example.com`.
+## Scope of `policy=wildcard`
+
+When a DNS TXT record includes the `policy=wildcard` parameter value, it authorizes certificate issuance for:
+
+1. **The validated FQDN itself** - The base domain for which the TXT record exists (e.g., `example.com`)
+2. **Wildcard certificates** - Certificates covering immediate subdomains (e.g., `*.example.com`)
+3. **Specific subdomains** - Any specific subdomain of the validated FQDN (e.g., `www.example.com`, `app.example.com`, `server.dept.example.com`)
+
+For example, a TXT record at `_validation-persist.example.com` containing `policy=wildcard` can validate certificates for `example.com`, `*.example.com`, `www.example.com`, and any other subdomain of `example.com`.
+
+If the `policy` parameter is absent, or if its value is anything other than `wildcard`, the validation applies only to the specific FQDN being validated and MUST NOT be considered sufficient for wildcard certificates or subdomains.
 
 # Subdomain Certificate Validation {#subdomain-certificate-validation}
 
-If an FQDN has been successfully validated using this method, the CA MAY also consider this validation sufficient for issuing certificates for other FQDNs that are subdomains of the validated FQDN, under the following conditions:
+When the `policy=wildcard` parameter is present (as described in {{wildcard-certificate-validation}}), CAs MAY issue certificates for subdomains of the validated FQDN. This section describes the implementation details for subdomain validation.
 
-- The persistent DNS TXT record MUST include `policy=wildcard`.
+## Determining Permitted Subdomains
 
-    To determine which subdomains are permitted, the FQDN for which the persistent TXT record exists (referred to as the "validated FQDN") must appear as the exact suffix of the FQDN for which a certificate is requested (referred to as the "requested FQDN"). For example, if `dept.example.com` is the validated FQDN, a certificate for `server.dept.example.com` is permitted because `dept.example.com` is its suffix.
+To determine which subdomains are permitted, the FQDN for which the persistent TXT record exists (referred to as the "validated FQDN") must appear as the exact suffix of the FQDN for which a certificate is requested (referred to as the "requested FQDN").
 
-When `policy=wildcard` is present, the validation authorizes certificates for the *validated FQDN itself*, for *any specific subdomain* of the validated FQDN (per the suffix rule), and for wildcard certificates covering the validated FQDN (e.g., `*.example.com` if `example.com` is the validated FQDN). This policy grants broad scope of validation for both specific subdomains and wildcard certificates.
+For example, if `dept.example.com` is the validated FQDN, a certificate for `server.dept.example.com` is permitted because `dept.example.com` is its suffix.
 
-If the `policy` parameter is absent, or if it is present but its value does not explicitly authorize subdomain validation (e.g., an unrecognized or future policy value), this validation MUST NOT be considered sufficient for issuing certificates for subdomains.
+## Implementation Requirements
+
+- The persistent DNS TXT record MUST include `policy=wildcard` for subdomain validation to be permitted.
+- CAs MUST verify that the validated FQDN is a proper suffix of the requested FQDN.
+- If the `policy` parameter is absent or has any value other than `wildcard`, subdomain validation MUST NOT be permitted.
 
 See {{subdomain-validation-risks}} for important security implications of enabling subdomain validation.
 
-## Example: Scope of 'wildcard' Policy
+## Example: Subdomain Validation
 
-For a persistent TXT record provisioned at `_validation-persist.example.com` with a `policy` of `wildcard`, a CA may issue certificates for `example.com`, `www.example.com`, `app.example.com`, and `*.example.com`.
+For a persistent TXT record provisioned at `_validation-persist.example.com` with `policy=wildcard`:
+- Permitted: `example.com`, `www.example.com`, `app.example.com`, `server.dept.example.com`, `*.example.com`
+- Not permitted without additional validation: `otherexample.com`, `example.net`
 
 # Security Considerations {#security-considerations}
 
@@ -451,6 +469,8 @@ When implementing the "dns-persist-01" validation method, Certificate Authoritie
    - The `accounturi` parameter in the DNS TXT record does not match the URI of the ACME account making the request
    - The `persistUntil` timestamp has expired, indicating that the validation record is no longer considered valid for new validation attempts
    - The `issuer-domain-name` in the DNS TXT record does not match any of the values provided in the `issuer-domain-names` array of the challenge object
+
+Note that these error codes apply to validation attempts on specific challenges. In the case of Just-in-Time Validation (see {{just-in-time-validation}}), when a CA finds a pre-existing DNS TXT record that does not meet validation requirements, the CA proceeds with the standard authorization flow by issuing a new `pending` challenge rather than returning an error.
 
 These error codes help ACME clients distinguish between different types of validation failures and take appropriate corrective actions.
 
