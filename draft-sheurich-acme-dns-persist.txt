@@ -219,9 +219,9 @@ Table of Contents
       Practices Statement to identify the CA for the purposes of this
       validation method.
 
-      Note: The issuer-domain-names provided in the challenge object
-      SHOULD be drawn from the machine-readable caaIdentities array in
-      the ACME server's directory object, as specified in [RFC8555],
+      Note: The issuer-domain-names provided in the challenge object MAY
+      be drawn from the machine-readable caaIdentities array in the ACME
+      server's directory object, as specified in [RFC8555],
       Section 9.7.6.  This creates a clearer programmatic link between
       the server's advertised identities and the challenge object.
 
