@@ -303,7 +303,7 @@ The persistence of validation records creates extended windows of vulnerability 
 Clients SHOULD protect validation records through appropriate DNS security measures, including:
 
 - Using DNS providers with strong authentication and access controls
-- Implementing DNS security extensions (DNSSEC) where possible
+- Implementing DNS Security Extensions (DNSSEC) where possible
 - Monitoring DNS zones for unauthorized changes
 - Regularly reviewing and rotating validation records
 
@@ -354,7 +354,7 @@ The persistent nature of validation records raises concerns about potential reus
 
 DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs SHOULD implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.
 
-Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures. Using DNSSEC is a recommended mechanism for this purpose. An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
+Additionally, CAs MUST protect their `issuer-domain-name` with robust security measures. Using DNSSEC to protect the CA's `issuer-domain-name` is a recommended mechanism for this purpose. An attacker who compromises the DNS for a CA's `issuer-domain-name` could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.
 
 ## Issuer Domain Name Normalization and Limits
 
@@ -368,9 +368,7 @@ To enhance the security and integrity of the validation process, CAs and clients
 
 ### DNSSEC
 
-DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data. This is a critical security measure that ensures the validation records retrieved by a CA are authentic and have not been tampered with.
-
-For CAs operating within the public WebPKI, the use of DNSSEC is a vital best practice for ensuring the integrity of domain validation. For private or closed PKI environments, DNSSEC is strongly recommended but may not be required, depending on the trust model and risk profile of the specific deployment.
+DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data, ensuring that the validation records retrieved by a CA are authentic and have not been tampered with. To ensure the integrity of the validation process, DNSSEC signatures SHOULD be validated on `dns-persist-01` TXT records.
 
 ### Multi-Perspective Validation
 
