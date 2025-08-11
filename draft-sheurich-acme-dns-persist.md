@@ -106,7 +106,7 @@ Certification Authorities operating under various trust program requirements wil
 **Issuer Domain Name**
 :   A domain name disclosed by the CA in Section 4.2 of the CA's Certificate Policy and/or Certification Practices Statement to identify the CA for the purposes of this validation method.
 
-    Note: The `issuer-domain-names` provided in the challenge object SHOULD be drawn from the machine-readable `caaIdentities` array in the ACME server's directory object, as specified in {{!RFC8555}}, Section 9.7.6. This creates a clearer programmatic link between the server's advertised identities and the challenge object.
+    Note: The `issuer-domain-names` provided in the challenge object MAY be drawn from the machine-readable `caaIdentities` array in the ACME server's directory object, as specified in {{!RFC8555}}, Section 9.7.6. This creates a clearer programmatic link between the server's advertised identities and the challenge object.
 
 **Validation Data Reuse Period**
 :   The period during which a CA may rely on validation data, as defined by the CA's practices and applicable requirements.
