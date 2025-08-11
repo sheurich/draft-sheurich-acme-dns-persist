@@ -1762,7 +1762,7 @@ _validation-persist.example.org. 3600 IN TXT ("ca2.example;"
             <p id="section-7.1-3.1.1">Using DNS providers with strong authentication and access controls<a href="#section-7.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-3.2">
-            <p id="section-7.1-3.2.1">Implementing DNS security extensions (DNSSEC) where possible<a href="#section-7.1-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-7.1-3.2.1">Implementing DNS Security Extensions (DNSSEC) where possible<a href="#section-7.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-7.1-3.3">
             <p id="section-7.1-3.3.1">Monitoring DNS zones for unauthorized changes<a href="#section-7.1-3.3.1" class="pilcrow">¶</a></p>
@@ -1859,7 +1859,7 @@ _validation-persist.example.org. 3600 IN TXT ("ca2.example;"
 <a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-record-tampering-and-integr" class="section-name selfRef">Record Tampering and Integrity</a>
         </h3>
 <p id="section-7.5-1">DNS records are generally not authenticated end-to-end, making them potentially vulnerable to tampering. CAs <span class="bcp14">SHOULD</span> implement additional integrity checks where possible and consider the overall security posture of the DNS infrastructure when relying on persistent validation records.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">Additionally, CAs <span class="bcp14">MUST</span> protect their <code>issuer-domain-name</code> with robust security measures. Using DNSSEC is a recommended mechanism for this purpose. An attacker who compromises the DNS for a CA's <code>issuer-domain-name</code> could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">Additionally, CAs <span class="bcp14">MUST</span> protect their <code>issuer-domain-name</code> with robust security measures. Using DNSSEC to protect the CA's <code>issuer-domain-name</code> is a recommended mechanism for this purpose. An attacker who compromises the DNS for a CA's <code>issuer-domain-name</code> could disrupt validation or potentially impersonate the CA in certain scenarios. While this is a systemic DNS security risk that extends beyond this specification, it is amplified by any mechanism that relies on DNS for identity.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="issuer-domain-name-normalization-and-limits">
@@ -1882,8 +1882,7 @@ _validation-persist.example.org. 3600 IN TXT ("ca2.example;"
           <h4 id="name-dnssec">
 <a href="#section-7.7.1" class="section-number selfRef">7.7.1. </a><a href="#name-dnssec" class="section-name selfRef">DNSSEC</a>
           </h4>
-<p id="section-7.7.1-1">DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data. This is a critical security measure that ensures the validation records retrieved by a CA are authentic and have not been tampered with.<a href="#section-7.7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.7.1-2">For CAs operating within the public WebPKI, the use of DNSSEC is a vital best practice for ensuring the integrity of domain validation. For private or closed PKI environments, DNSSEC is strongly recommended but may not be required, depending on the trust model and risk profile of the specific deployment.<a href="#section-7.7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.7.1-1">DNS Security Extensions (DNSSEC) provide cryptographic authentication of DNS data, ensuring that the validation records retrieved by a CA are authentic and have not been tampered with. To ensure the integrity of the validation process, DNSSEC signatures <span class="bcp14">SHOULD</span> be validated on <code>dns-persist-01</code> TXT records.<a href="#section-7.7.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="multi-perspective-validation">
